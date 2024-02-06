@@ -56,8 +56,8 @@ class PasswordPolicyExtension extends Extension
       $passwordExpiryConfig->setArguments([
         $entityClass,
         $settings['expiry_days'],
-        $settings['lock_routes'],
-        $settings['excluded_routes'],
+        $settings['notified_routes'],
+        $settings['excluded_notified_routes'],
       ]);
 
       $expiryService->addMethodCall('addEntity', [$passwordExpiryConfig]);

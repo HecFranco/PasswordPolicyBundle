@@ -27,13 +27,11 @@ hec_franco_password_policy:
     entities:
         # the entity class implementing HasPasswordPolicyInterface
         App\Entity\Participant:
-            # The route where the user will be locked when password is expired
-            lock_route: participant_profile
-
-            # Params to pass to the locked param when build.
-            lock_route_params:
-                    locked: '1'
-
+            # The route where the user will be notified when password is expired
+            notified_routes: 
+                - participant_profile
+            # These routes will be excluded from the expiry check
+            excluded_notified_routes: ~
             # Which is the password property in the entity (defaults to 'password')
             password_field: ~
 
@@ -46,22 +44,20 @@ hec_franco_password_policy:
             # Force expiry of the password in that many days
             expiry_days: ~
         App\Entity\User:
-            lock_route: admin_app_user_edit
-            lock_route_params:
-                    # {id} will paresed as current user id when possible
-                    id: '{id}'
+            notified_routes: 
+                - admin_app_user_edit
     expiry_listener:
             # You can change the expiry listener priority
             priority: 0
             error_msg:
-                text: 'Your password expired. You need to change it'
+                text:
+                    title: 'Your password expired.'
+                    message: 'You need to change it'
                 type: 'error'
 
         listener_priority: 0
         # The route that needs to be shown to the user when password is expired
         lock_route: participant_settings
-        # These routes will be excluded from the expiry check
-        excluded_routes: ~
 ```
 
 ##### Expiry

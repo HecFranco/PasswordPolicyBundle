@@ -83,6 +83,8 @@ class Configuration implements ConfigurationInterface
       ->defaultValue(self::DEFAULT_EXPIRY_LISTENER_PRIORITY)
       ->treatNullLike(self::DEFAULT_EXPIRY_LISTENER_PRIORITY)
       ->end()
+      ->scalarNode('lock_route')
+      ->end()
       ->arrayNode('error_msg')
         ->addDefaultsIfNotSet()
       ->children()

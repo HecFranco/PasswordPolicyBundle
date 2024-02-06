@@ -10,8 +10,11 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 // services
 use HecFranco\PasswordPolicyBundle\Service\PasswordExpiryServiceInterface;
+use Lexik\Bundle\TranslationBundle\Translation\Translator;
 // attributes
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AsEventListener(event: 'kernel.request', method: 'onKernelRequest')]
 class PasswordExpiryListener
@@ -25,7 +28,7 @@ class PasswordExpiryListener
   /**
    * @var string
    */
-  private string $errorMessage;
+  private string|array $errorMessage;
 
 
   /**
@@ -39,8 +42,10 @@ class PasswordExpiryListener
   public function __construct(
     public PasswordExpiryServiceInterface $passwordExpiryService,
     public SessionInterface $session,
+    public UrlGeneratorInterface $router,
+    public TranslatorInterface $translator,
     string $errorMessageType,
-    string $errorMessage
+    string|array $errorMessage
   ) {
     $this->errorMessageType = $errorMessageType;
     $this->errorMessage = $errorMessage;
@@ -67,20 +72,30 @@ class PasswordExpiryListener
     //
     $isLockedRoute = $this->passwordExpiryService->isLockedRoute($route);
 
-    if ($isLockedRoute) {
+    if (!$isLockedRoute) {
       return;
     }
-
-    if (
-      !in_array($route, $this->passwordExpiryService->getExcludedRoutes())
-      && $this->passwordExpiryService->isPasswordExpired()
-    ) {
+    //
+    $excludeRoutes = $this->passwordExpiryService->getExcludedRoutes();
+    $isPasswordExpired = $this->passwordExpiryService->isPasswordExpired();
+    //
+    if ( !in_array($route, $excludeRoutes) && $isPasswordExpired ) {
       if ($this->session instanceof Session) {
+
+        if (is_array($this->errorMessage)) {
+          foreach($this->errorMessage as $key => $value){
+            $this->errorMessage[$key] = $this->translator->trans($value, [], 'PasswordPolicyBundle');
+          }
+        } else {
+          $this->errorMessage = $this->translator->trans($this->errorMessage, [], 'PasswordPolicyBundle');
+        }
+
         $this->session->getFlashBag()->add($this->errorMessageType, $this->errorMessage);
       }
-      //
-      $requestUri = $request->get('pathInfo');
-      $event->setResponse(new RedirectResponse($requestUri));
+      // TODO: check if this is the correct way to get the reset password route name
+      // $resetPasswordRouteName = $this->passwordExpiryService->getResetPasswordRouteName();
+      // $resetPasswordUrl = $this->router->generate($resetPasswordRouteName);
+      // $event->setResponse(new RedirectResponse($resetPasswordUrl));
     }
   }
 }

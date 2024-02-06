@@ -7,7 +7,7 @@ namespace HecFranco\PasswordPolicyBundle\Service;
 use HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface;
 use HecFranco\PasswordPolicyBundle\Model\PasswordExpiryConfiguration;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\HecFranco\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class PasswordExpiryService implements PasswordExpiryServiceInterface
 {
@@ -16,24 +16,14 @@ class PasswordExpiryService implements PasswordExpiryServiceInterface
    */
   private $entities;
 
-  /**
-   * @var \Symfony\Component\Security\HecFranco\Authentication\Token\Storage\TokenStorageInterface
-   */
-  private $tokenStorage;
-  /**
-   * @var \Symfony\Component\Routing\Generator\UrlGeneratorInterface
-   */
-  private $router;
 
   /**
    * PasswordExpiryService constructor.
-   * @param \Symfony\Component\Security\HecFranco\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
+   * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
    * @param \Symfony\Component\Routing\Generator\UrlGeneratorInterface $router
    */
-  public function __construct(TokenStorageInterface $tokenStorage, UrlGeneratorInterface $router)
+  public function __construct(public TokenStorageInterface $tokenStorage, public UrlGeneratorInterface $router)
   {
-    $this->tokenStorage = $tokenStorage;
-    $this->router = $router;
   }
 
   /**
@@ -55,29 +45,6 @@ class PasswordExpiryService implements PasswordExpiryServiceInterface
 
 
     return false;
-  }
-
-  /**
-   * @param string|null $entityClass
-   * @param array $params
-   * @return string
-   */
-  public function generateLockedRoute(string $entityClass = null, array $params = []): string
-  {
-    $lockedRoute = $this->getLockedRoutes($entityClass);
-
-    $params = array_merge($lockedParams, $params);
-
-    foreach ($params as $param => &$value) {
-      if ($value === '{id}') {
-        $value = $this->getCurrentUser() ? $this->getCurrentUser()->getId() : $value;
-      }
-    }
-    //
-    if ($lockedRoute) {
-      return $this->router->generate($lockedRoute, $params);
-    }
-    return '';
   }
 
   /**
@@ -113,7 +80,10 @@ class PasswordExpiryService implements PasswordExpiryServiceInterface
     //
     return false;
   }
+  public function getResetPasswordRouteName(): string
+  {
 
+  }
   /**
    * @param string $entityClass
    * @return array

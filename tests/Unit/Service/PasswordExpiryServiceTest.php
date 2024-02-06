@@ -10,8 +10,8 @@ use HecFranco\PasswordPolicyBundle\Service\PasswordExpiryService;
 use HecFranco\PasswordPolicyBundle\Service\PasswordExpiryServiceInterface;
 use HecFranco\PasswordPolicyBundle\Tests\UnitTestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\HecFranco\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\HecFranco\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class PasswordExpiryServiceTest extends UnitTestCase
 {
@@ -31,7 +31,7 @@ class PasswordExpiryServiceTest extends UnitTestCase
     private $passwordExpiryServiceMock;
 
     /**
-     * @var \Symfony\Component\Security\HecFranco\Authentication\Token\Storage\TokenStorage|\Mockery\Mock
+     * @var \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage|\Mockery\Mock
      */
     private $tokenStorageMock;
 

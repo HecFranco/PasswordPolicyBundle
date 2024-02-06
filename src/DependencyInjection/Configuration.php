@@ -10,12 +10,17 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class Configuration implements ConfigurationInterface
 {
   public const ALIAS = 'hec_franco_password_policy';
+  // 
   private const DEFAULT_PASSWORD_FIELD = 'password';
   private const DEFAULT_PASSWORD_HISTORY_FIELD = 'passwordHistory';
   private const DEFAULT_PASSWORDS_TO_REMEMBER = 3;
   private const DEFAULT_EXPIRY_LISTENER_PRIORITY = 0;
   private const DEFAULT_EXPIRY_DAYS = 90;
-  private const DEFAULT_ERROR_MSG = 'Your password expired. You need to change it';
+  //
+  private const DEFAULT_ERROR_MSG = [
+    'title' => self::ALIAS.'.title',
+    'message' => self::ALIAS.'.message'
+  ];
   private const DEFAULT_ERROR_TYPE = 'error';
 
   /**
@@ -59,6 +64,9 @@ class Configuration implements ConfigurationInterface
       ->defaultValue(self::DEFAULT_EXPIRY_DAYS)
       ->treatNullLike(self::DEFAULT_EXPIRY_DAYS)
       ->end()
+      ->scalarNode('reset_password_route_name')
+      ->isRequired()
+      ->end()
       ->arrayNode('lock_routes')
         ->scalarPrototype()->end()
       ->end()
@@ -76,9 +84,9 @@ class Configuration implements ConfigurationInterface
       ->treatNullLike(self::DEFAULT_EXPIRY_LISTENER_PRIORITY)
       ->end()
       ->arrayNode('error_msg')
-      ->addDefaultsIfNotSet()
+        ->addDefaultsIfNotSet()
       ->children()
-      ->scalarNode('text')
+      ->variableNode('text')
       ->defaultValue(self::DEFAULT_ERROR_MSG)
       ->treatNullLike(self::DEFAULT_ERROR_MSG)
       ->end()

@@ -1,13 +1,11 @@
 {
   "name": "hec-franco/password-policy-bundle",
-  "description": "Password policy enforcements",
+  "description": "Password policy enforcements for symfony 6|7",
   "type": "library",
   "require": {
     "php": "^8.0",
     "symfony/framework-bundle": "^6.0|^7.0",
     "symfony/validator": "^6.0|^7.0",
-    "doctrine/collections": "^1.5",
-    "doctrine/orm": "^2.6",
     "nesbot/carbon": "~1.18"
   },
   "require-dev": {

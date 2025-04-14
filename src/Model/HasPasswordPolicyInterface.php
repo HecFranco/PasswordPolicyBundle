@@ -19,12 +19,12 @@ interface HasPasswordPolicyInterface
   public function getId();
 
   /**
-   * @return \DateTime
+   * @return DateTime
    */
   public function getPasswordChangedAt(): ?DateTime;
 
   /**
-   * @param \DateTime $dateTime
+   * @param DateTime $dateTime
    */
   public function setPasswordChangedAt(DateTime $dateTime): self;
 
@@ -34,7 +34,7 @@ interface HasPasswordPolicyInterface
   public function getPasswordHistory(): Collection;
 
   /**
-   * @param \HecFranco\PasswordPolicyBundle\Model\PasswordHistoryInterface $passwordHistory
+   * @param PasswordHistoryInterface $passwordHistory
    */
   public function addPasswordHistory(PasswordHistoryInterface $passwordHistory): static;
 

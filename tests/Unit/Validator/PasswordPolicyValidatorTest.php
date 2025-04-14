@@ -4,6 +4,7 @@
 namespace HecFranco\PasswordPolicyBundle\Tests\Unit\Validator;
 
 
+use Mockery\Mock;
 use Mockery;
 use DateTime;
 use HecFranco\PasswordPolicyBundle\Exceptions\ValidationException;
@@ -20,23 +21,23 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 class PasswordPolicyValidatorTest extends UnitTestCase
 {
   /**
-   * @var \HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface|\Mockery\Mock
+   * @var HasPasswordPolicyInterface|Mock
    */
   private $entityMock;
   /**
-   * @var \Symfony\Component\Validator\Context\ExecutionContextInterface|\Mockery\Mock
+   * @var ExecutionContextInterface|Mock
    */
   private $contextMock;
   /**
-   * @var \HecFranco\PasswordPolicyBundle\Validator\PasswordPolicyValidator|\Mockery\Mock
+   * @var PasswordPolicyValidator|Mock
    */
   private $validator;
   /**
-   * @var PasswordPolicyServiceInterface|\Mockery\Mock
+   * @var PasswordPolicyServiceInterface|Mock
    */
   private $passwordPolicyServiceMock;
   /**
-   * @var \Symfony\Component\Translation\TranslatorInterface|\Mockery\Mock
+   * @var \Symfony\Component\Translation\TranslatorInterface|Mock
    */
   private $translatorMock;
 

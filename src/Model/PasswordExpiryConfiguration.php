@@ -9,10 +9,7 @@ use HecFranco\PasswordPolicyBundle\Exceptions\RuntimeException;
 class PasswordExpiryConfiguration
 {
 
-  private string $entityClass;
-  private int $expiryDays;
-  private array $lockRoutes;
-  private array $excludedRoutes;
+  private readonly string $entityClass;
 
   /**
    * PasswordExpiryConfiguration constructor.
@@ -23,9 +20,9 @@ class PasswordExpiryConfiguration
    */
   public function __construct(
     string $class,
-    int $expiryDays,
-    array $lockRoutes = [],
-    array $excludedRoutes = []
+    private readonly int $expiryDays,
+    private readonly array $lockRoutes = [],
+    private readonly array $excludedRoutes = []
   ) {
     if (!is_a($class, HasPasswordPolicyInterface::class, true)) {
       throw new RuntimeException(sprintf(
@@ -35,9 +32,6 @@ class PasswordExpiryConfiguration
       ));
     }
     $this->entityClass = $class;
-    $this->expiryDays = $expiryDays;
-    $this->lockRoutes = $lockRoutes;
-    $this->excludedRoutes = $excludedRoutes;
   }
 
   /**

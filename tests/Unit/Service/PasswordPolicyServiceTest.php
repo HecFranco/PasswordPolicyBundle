@@ -4,6 +4,7 @@
 namespace HecFranco\PasswordPolicyBundle\Tests\Unit\Service;
 
 
+use Mockery\Mock;
 use Mockery;
 use HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface;
 use HecFranco\PasswordPolicyBundle\Service\PasswordPolicyService;
@@ -17,15 +18,15 @@ use Symfony\Component\Security\HecFranco\Encoder\PasswordEncoderInterface;
 class PasswordPolicyServiceTest extends UnitTestCase
 {
     /**
-     * @var \HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface|\Mockery\Mock
+     * @var HasPasswordPolicyInterface|Mock
      */
     private $entityMock;
     /**
-     * @var PasswordPolicyServiceInterface|\Mockery\Mock
+     * @var PasswordPolicyServiceInterface|Mock
      */
     private $passwordPolicyServiceMock;
     /**
-     * @var \Symfony\Component\Security\HecFranco\Encoder\PasswordEncoderInterface|\Mockery\Mock
+     * @var \Symfony\Component\Security\HecFranco\Encoder\PasswordEncoderInterface|Mock
      */
     private $passwordEncoderFactoryMock;
 
@@ -110,7 +111,7 @@ class PasswordPolicyServiceTest extends UnitTestCase
     }
 
     /**
-     * @return \Mockery\Mock|\HecFranco\PasswordPolicyBundle\Tests\Unit\Mocks\PasswordHistoryMock
+     * @return Mock|PasswordHistoryMock
      */
     private function makePasswordHistoryMock()
     {

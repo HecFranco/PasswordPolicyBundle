@@ -4,6 +4,7 @@
 namespace HecFranco\PasswordPolicyBundle\DependencyInjection;
 
 
+use Exception;
 use HecFranco\PasswordPolicyBundle\EventListener\PasswordEntityListener;
 use HecFranco\PasswordPolicyBundle\EventListener\PasswordExpiryListener;
 use HecFranco\PasswordPolicyBundle\Exceptions\ConfigurationException;
@@ -23,8 +24,8 @@ class PasswordPolicyExtension extends Extension
    * Loads a specific configuration.
    *
    * @param array $configs
-   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
-   * @throws \Exception
+   * @param ContainerBuilder $container
+   * @throws Exception
    */
   public function load(array $configs, ContainerBuilder $container): void
   {
@@ -65,9 +66,9 @@ class PasswordPolicyExtension extends Extension
   }
 
   /**
-   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   * @param ContainerBuilder $container
    * @param array $config
-   * @return \Symfony\Component\DependencyInjection\Definition
+   * @return Definition
    */
   private function addExpiryListener(ContainerBuilder $container, array $config): Definition
   {
@@ -81,11 +82,11 @@ class PasswordPolicyExtension extends Extension
   }
 
   /**
-   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   * @param ContainerBuilder $container
    * @param $entityClass
    * @param $settings
-   * @return \Symfony\Component\DependencyInjection\Definition
-   * @throws \HecFranco\PasswordPolicyBundle\Exceptions\ConfigurationException
+   * @return Definition
+   * @throws ConfigurationException
    */
   private function addEntityListener(
     ContainerBuilder $container,

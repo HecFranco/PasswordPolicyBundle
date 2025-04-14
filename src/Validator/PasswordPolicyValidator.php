@@ -4,6 +4,7 @@
 namespace HecFranco\PasswordPolicyBundle\Validator;
 
 
+use HecFranco\PasswordPolicyBundle\Model\PasswordHistoryInterface;
 use Carbon\Carbon;
 use HecFranco\PasswordPolicyBundle\Exceptions\ValidationException;
 use HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface;
@@ -15,15 +16,13 @@ use Symfony\Component\Validator\ConstraintValidator;
 class PasswordPolicyValidator extends ConstraintValidator
 {
 
-    private PasswordPolicyServiceInterface $passwordPolicyService;
     /**
      * @var \Symfony\Component\Translation\TranslatorInterface
      */
     private $translator;
 
-    public function __construct(PasswordPolicyServiceInterface $passwordPolicyService, TranslatorInterface $translator)
+    public function __construct(private readonly PasswordPolicyServiceInterface $passwordPolicyService, TranslatorInterface $translator)
     {
-        $this->passwordPolicyService = $passwordPolicyService;
         $this->translator = $translator;
     }
 
@@ -33,7 +32,7 @@ class PasswordPolicyValidator extends ConstraintValidator
      * @param mixed $value The value that should be validated
      * @param Constraint $constraint The constraint for the validation
      * @return bool
-     * @throws \HecFranco\PasswordPolicyBundle\Exceptions\ValidationException
+     * @throws ValidationException
      */
     public function validate($value, Constraint $constraint)
     {
@@ -50,7 +49,7 @@ class PasswordPolicyValidator extends ConstraintValidator
 
         Carbon::setLocale($this->translator->getLocale());
 
-        if ($history = $this->passwordPolicyService->getHistoryByPassword($value, $entity)) {
+        if (($history = $this->passwordPolicyService->getHistoryByPassword($value, $entity)) instanceof PasswordHistoryInterface) {
             $this->context->buildViolation($constraint->message)
                           ->setParameter('{{ days }}', Carbon::instance($history->getCreatedAt())->diffForHumans())
                           ->setCode(PasswordPolicy::PASSWORD_IN_HISTORY)

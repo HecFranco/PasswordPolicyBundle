@@ -24,7 +24,7 @@ trait PasswordHistoryTrait
     private $salt;
 
     /**
-     * @var \DateTime|null
+     * @var DateTime|null
      * @ORM\Column(type="datetime")
      */
     private $createdAt;
@@ -46,7 +46,7 @@ trait PasswordHistoryTrait
     }
 
     /**
-     * @return \DateTime|null
+     * @return DateTime|null
      */
     public function getCreatedAt(): ?DateTime
     {
@@ -54,7 +54,7 @@ trait PasswordHistoryTrait
     }
 
     /**
-     * @param \DateTime|null $createdAt
+     * @param DateTime|null $createdAt
      */
     public function setCreatedAt(?DateTime $createdAt): void
     {

@@ -19,17 +19,6 @@ class PasswordExpiryListener
 {
 
   /**
-   * @var string
-   */
-  private string $errorMessageType;
-
-  /**
-   * @var string
-   */
-  private string|array $errorMessage;
-
-
-  /**
    * The function is a constructor that initializes properties and dependencies for a class.
    *
    * @param string errorMessageType A string representing the type of error message. This could be used
@@ -38,15 +27,17 @@ class PasswordExpiryListener
    * message to be displayed.
    */
   public function __construct(
-    public PasswordExpiryServiceInterface $passwordExpiryService,
-    public SessionInterface $session,
-    public UrlGeneratorInterface $router,
-    public TranslatorInterface $translator,
-    string $errorMessageType,
-    string|array $errorMessage
-  ) {
-    $this->errorMessageType = $errorMessageType;
-    $this->errorMessage = $errorMessage;
+      public PasswordExpiryServiceInterface $passwordExpiryService,
+      public SessionInterface $session,
+      public UrlGeneratorInterface $router,
+      public TranslatorInterface $translator,
+      private readonly string $errorMessageType,
+      /**
+       * @var string
+       */
+      private string|array $errorMessage
+  )
+  {
   }
 
   /**

@@ -13,7 +13,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 class PasswordExpiryService implements PasswordExpiryServiceInterface
 {
   /**
-   * @var \HecFranco\PasswordPolicyBundle\Model\PasswordExpiryConfiguration[]
+   * @var PasswordExpiryConfiguration[]
    */
   private ?array $entities = null;
 
@@ -21,7 +21,7 @@ class PasswordExpiryService implements PasswordExpiryServiceInterface
   /**
    * PasswordExpiryService constructor.
    * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
-   * @param \Symfony\Component\Routing\Generator\UrlGeneratorInterface $router
+   * @param UrlGeneratorInterface $router
    */
   public function __construct(public TokenStorageInterface $tokenStorage, public UrlGeneratorInterface $router)
   {
@@ -97,7 +97,7 @@ class PasswordExpiryService implements PasswordExpiryServiceInterface
   }
 
   /**
-   * @param \HecFranco\PasswordPolicyBundle\Model\PasswordExpiryConfiguration $configuration
+   * @param PasswordExpiryConfiguration $configuration
    */
   public function addEntity(PasswordExpiryConfiguration $configuration): void
   {
@@ -105,7 +105,7 @@ class PasswordExpiryService implements PasswordExpiryServiceInterface
   }
 
   /**
-   * @return \HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface|null
+   * @return HasPasswordPolicyInterface|null
    */
   private function getCurrentUser(): ?HasPasswordPolicyInterface
   {
@@ -128,7 +128,7 @@ class PasswordExpiryService implements PasswordExpiryServiceInterface
   private function prepareEntityClass(?string $entityClass): ?string
   {
     if (is_null($entityClass) && $user = $this->getCurrentUser()) {
-      return get_class($user);
+      return $user::class;
     }
 
     return $entityClass;

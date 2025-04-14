@@ -19,35 +19,20 @@ use HecFranco\PasswordPolicyBundle\Service\PasswordHistoryServiceInterface;
 #[AsDoctrineListener(event: Events::onFlush, priority: 500, connection: 'default')]
 class PasswordEntityListener
 {
-  private string $passwordField;
-  private string $passwordHistoryField;
-  private int $historyLimit;
-
-  private string $entityClass;
-
   private array $processedNewEntities = [];
 
   private array $processedPasswords = [];
 
   /**
    * PasswordEntityListener constructor.
-   * @param \HecFranco\PasswordPolicyBundle\Service\PasswordHistoryServiceInterface $passwordHistoryService
+   * @param PasswordHistoryServiceInterface $passwordHistoryService
    * @param string $passwordField
    * @param string $passwordHistoryField
    * @param int $historyLimit
    * @param string $entityClass
    */
-  public function __construct(
-    public PasswordHistoryServiceInterface $passwordHistoryService,
-    string $passwordField,
-    string $passwordHistoryField,
-    int $historyLimit,
-    string $entityClass
-  ) {
-    $this->passwordField = $passwordField;
-    $this->passwordHistoryField = $passwordHistoryField;
-    $this->historyLimit = $historyLimit;
-    $this->entityClass = $entityClass;
+  public function __construct(public PasswordHistoryServiceInterface $passwordHistoryService, private readonly string $passwordField, private readonly string $passwordHistoryField, private readonly int $historyLimit, private readonly string $entityClass)
+  {
   }
 
   #[ORM\OnFlush]
@@ -104,7 +89,7 @@ class PasswordEntityListener
     }
     //
     $unitOfWork = $em->getUnitOfWork();
-    $entityMeta = $em->getClassMetadata(get_class($entity));
+    $entityMeta = $em->getClassMetadata($entity::class);
     //
     $historyClass = $entityMeta->associationMappings[$this->passwordHistoryField]['targetEntity'];
     $mappedField = $entityMeta->associationMappings[$this->passwordHistoryField]['mappedBy'];
@@ -119,7 +104,7 @@ class PasswordEntityListener
       ));
     }
     //
-    $userSetter = 'set' . ucfirst($mappedField);
+    $userSetter = 'set' . ucfirst((string) $mappedField);
     // Check if the history class has a setter method for the user relation.
     if (!method_exists($history, $userSetter)) {
       throw new RuntimeException(sprintf(

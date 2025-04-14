@@ -22,8 +22,8 @@ class PasswordPolicyService implements PasswordPolicyServiceInterface
 
     /**
      * @param string $password
-     * @param \HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface $entity
-     * @return \HecFranco\PasswordPolicyBundle\Model\PasswordHistoryInterface|null
+     * @param HasPasswordPolicyInterface $entity
+     * @return PasswordHistoryInterface|null
      */
     public function getHistoryByPassword(
         string $password,
@@ -43,7 +43,7 @@ class PasswordPolicyService implements PasswordPolicyServiceInterface
     }
 
     /**
-     * @param \HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface $entity
+     * @param HasPasswordPolicyInterface $entity
      * @return \Symfony\Component\Security\HecFranco\Encoder\PasswordEncoderInterface
      */
     public function getEncoder(HasPasswordPolicyInterface $user, string $password): UserPasswordHasherInterface

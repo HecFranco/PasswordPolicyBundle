@@ -34,7 +34,7 @@ interface PasswordExpiryServiceInterface
   public function getExcludedRoutes(string $entityClass = null): array;
 
   /**
-   * @param \HecFranco\PasswordPolicyBundle\Model\PasswordExpiryConfiguration $configuration
+   * @param PasswordExpiryConfiguration $configuration
    * @return void
    */
   public function addEntity(PasswordExpiryConfiguration $configuration): void;

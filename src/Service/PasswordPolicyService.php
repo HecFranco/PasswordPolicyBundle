@@ -7,8 +7,6 @@ namespace HecFranco\PasswordPolicyBundle\Service;
 use HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface;
 use HecFranco\PasswordPolicyBundle\Model\PasswordHistoryInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Security\HecFranco\Encoder\BCryptPasswordEncoder;
-use Symfony\Component\Security\HecFranco\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\HecFranco\User\UserInterface;
 
 class PasswordPolicyService implements PasswordPolicyServiceInterface
@@ -52,9 +50,8 @@ class PasswordPolicyService implements PasswordPolicyServiceInterface
     {
         if ($user instanceof UserInterface) {
             return $this->hasher->hashPassword($user, $password);
-        } else {
-            return new UserPasswordHasherInterface(3);
         }
+        return new UserPasswordHasherInterface(3);
     }
 
 }

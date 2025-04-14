@@ -4,6 +4,7 @@
 namespace HecFranco\PasswordPolicyBundle\Model;
 
 
+use DateTime;
 use Doctrine\Common\Collections\Collection;
 
 /**
@@ -20,12 +21,12 @@ interface HasPasswordPolicyInterface
   /**
    * @return \DateTime
    */
-  public function getPasswordChangedAt(): ?\DateTime;
+  public function getPasswordChangedAt(): ?DateTime;
 
   /**
    * @param \DateTime $dateTime
    */
-  public function setPasswordChangedAt(\DateTime $dateTime): self;
+  public function setPasswordChangedAt(DateTime $dateTime): self;
 
   /**
    * @return \Doctrine\Common\Collections\Collection

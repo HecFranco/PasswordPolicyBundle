@@ -2,7 +2,6 @@
 
 namespace HecFranco\PasswordPolicyBundle\EventListener;
 
-use Symfony\Component\HttpFoundation\RedirectResponse;
 //
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 //
@@ -10,7 +9,6 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 // services
 use HecFranco\PasswordPolicyBundle\Service\PasswordExpiryServiceInterface;
-use Lexik\Bundle\TranslationBundle\Translation\Translator;
 // attributes
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -60,7 +58,7 @@ class PasswordExpiryListener
    *
    * @return The code returns either nothing (null) or a RedirectResponse object.
    */
-  public function onKernelRequest(RequestEvent $event)
+  public function onKernelRequest(RequestEvent $event): void
   {
     //
     if (!$event->isMainRequest()) {

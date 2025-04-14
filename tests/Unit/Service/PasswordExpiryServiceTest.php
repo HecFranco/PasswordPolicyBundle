@@ -4,6 +4,8 @@
 namespace HecFranco\PasswordPolicyBundle\Tests\Unit\Service;
 
 
+use Mockery;
+use DateTime;
 use HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface;
 use HecFranco\PasswordPolicyBundle\Model\PasswordExpiryConfiguration;
 use HecFranco\PasswordPolicyBundle\Service\PasswordExpiryService;
@@ -35,12 +37,12 @@ class PasswordExpiryServiceTest extends UnitTestCase
      */
     private $tokenStorageMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->tokenStorageMock = \Mockery::mock(TokenStorageInterface::class);
-        $this->routerMock = \Mockery::mock(UrlGeneratorInterface::class);
-        $this->userMock = \Mockery::mock(HasPasswordPolicyInterface::class);
-        $this->passwordExpiryServiceMock = \Mockery::mock(PasswordExpiryService::class, [
+        $this->tokenStorageMock = Mockery::mock(TokenStorageInterface::class);
+        $this->routerMock = Mockery::mock(UrlGeneratorInterface::class);
+        $this->userMock = Mockery::mock(HasPasswordPolicyInterface::class);
+        $this->passwordExpiryServiceMock = Mockery::mock(PasswordExpiryService::class, [
             $this->tokenStorageMock,
             $this->routerMock,
         ])->makePartial();
@@ -49,15 +51,15 @@ class PasswordExpiryServiceTest extends UnitTestCase
     /**
      * @throws \HecFranco\PasswordPolicyBundle\Exceptions\RuntimeException
      */
-    public function testIsPasswordExpired()
+    public function testIsPasswordExpired(): void
     {
-        $expiredPassword = (new \DateTime())->modify('-100 days');
-        $notExpiredPassword = (new \DateTime())->modify('-89 days');
+        $expiredPassword = (new DateTime())->modify('-100 days');
+        $notExpiredPassword = (new DateTime())->modify('-89 days');
         $this->userMock->shouldReceive('getPasswordChangedAt')
                        ->twice()
                        ->andReturn($expiredPassword, $notExpiredPassword);
 
-        $tokenMock = \Mockery::mock(TokenInterface::class)
+        $tokenMock = Mockery::mock(TokenInterface::class)
                              ->shouldReceive('getUser')
                              ->andReturn($this->userMock)
                              ->getMock();
@@ -73,9 +75,9 @@ class PasswordExpiryServiceTest extends UnitTestCase
         $this->assertFalse($this->passwordExpiryServiceMock->isPasswordExpired());
     }
 
-    public function testGenerateLockedRoute()
+    public function testGenerateLockedRoute(): void
     {
-        $tokenMock = \Mockery::mock(TokenInterface::class)
+        $tokenMock = Mockery::mock(TokenInterface::class)
                              ->shouldReceive('getUser')
                              ->andReturn($this->userMock)
                              ->getMock();

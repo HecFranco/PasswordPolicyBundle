@@ -4,6 +4,7 @@
 namespace HecFranco\PasswordPolicyBundle\Tests\Unit\EventListener;
 
 
+use Mockery;
 use HecFranco\PasswordPolicyBundle\EventListener\PasswordEntityListener;
 use HecFranco\PasswordPolicyBundle\Exceptions\RuntimeException;
 use HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface;
@@ -41,17 +42,17 @@ class PasswordEntityListenerTest extends UnitTestCase
      */
     private $uowMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->passwordHistoryServiceMock = \Mockery::mock(PasswordHistoryServiceInterface::class);
+        $this->passwordHistoryServiceMock = Mockery::mock(PasswordHistoryServiceInterface::class);
 
-        $this->emMock = \Mockery::mock(EntityManagerInterface::class);
+        $this->emMock = Mockery::mock(EntityManagerInterface::class);
 
-        $this->entityMock = \Mockery::mock(HasPasswordPolicyInterface::class);
+        $this->entityMock = Mockery::mock(HasPasswordPolicyInterface::class);
 
-        $this->uowMock = \Mockery::mock(UnitOfWork::class);
+        $this->uowMock = Mockery::mock(UnitOfWork::class);
 
-        $this->passwordEntityListener = \Mockery::mock(PasswordEntityListener::class, [
+        $this->passwordEntityListener = Mockery::mock(PasswordEntityListener::class, [
             $this->passwordHistoryServiceMock,
             'password',
             'passwordHistory',
@@ -63,7 +64,7 @@ class PasswordEntityListenerTest extends UnitTestCase
     /**
      * @throws \HecFranco\PasswordPolicyBundle\Exceptions\RuntimeException
      */
-    public function testOnFlushUpdates()
+    public function testOnFlushUpdates(): void
     {
         $this->uowMock->shouldReceive('getScheduledEntityUpdates')
                       ->once()
@@ -94,7 +95,7 @@ class PasswordEntityListenerTest extends UnitTestCase
         $this->assertTrue(true);
     }
 
-    public function testCreatePasswordHistory()
+    public function testCreatePasswordHistory(): void
     {
         $this->emMock->shouldReceive('getUnitOfWork')
                      ->once()
@@ -116,7 +117,7 @@ class PasswordEntityListenerTest extends UnitTestCase
         $this->entityMock->shouldReceive('getSalt')
                          ->andReturn('salt');
 
-        $pwdHistoryMock = \Mockery::mock(PasswordHistoryMock::class);
+        $pwdHistoryMock = Mockery::mock(PasswordHistoryMock::class);
         $this->passwordHistoryServiceMock->shouldReceive('getHistoryItemsForCleanup')
                                          ->once()
                                          ->withArgs([$this->entityMock, 3])
@@ -129,7 +130,7 @@ class PasswordEntityListenerTest extends UnitTestCase
         $this->emMock->shouldReceive('persist')
                      ->once();
 
-        $classMetadataMock = \Mockery::mock(ClassMetadata::class);
+        $classMetadataMock = Mockery::mock(ClassMetadata::class);
 
         $this->emMock->shouldReceive('getClassMetadata')
                      ->once()
@@ -153,7 +154,7 @@ class PasswordEntityListenerTest extends UnitTestCase
         $this->assertEquals('salt', $history->getSalt());
     }
 
-    public function testCreatePasswordHistoryNullPassword()
+    public function testCreatePasswordHistoryNullPassword(): void
     {
         $this->uowMock->shouldReceive('recomputeSingleEntityChangeSet')
                       ->once();
@@ -170,7 +171,7 @@ class PasswordEntityListenerTest extends UnitTestCase
         $classMetadata->associationMappings['passwordHistory']['targetEntity'] = PasswordHistoryMock::class;
         $classMetadata->associationMappings['passwordHistory']['mappedBy'] = 'user';
 
-        $classMetadataMock = \Mockery::mock(ClassMetadata::class);
+        $classMetadataMock = Mockery::mock(ClassMetadata::class);
 
         $this->emMock->shouldReceive('getClassMetadata')
                      ->twice()
@@ -182,7 +183,7 @@ class PasswordEntityListenerTest extends UnitTestCase
         $this->entityMock->shouldReceive('getSalt')
                          ->andReturn('salt');
 
-        $pwdHistoryMock = \Mockery::mock(PasswordHistoryMock::class);
+        $pwdHistoryMock = Mockery::mock(PasswordHistoryMock::class);
         $this->passwordHistoryServiceMock->shouldReceive('getHistoryItemsForCleanup')
                                          ->once()
                                          ->withArgs([$this->entityMock, 3])
@@ -212,7 +213,7 @@ class PasswordEntityListenerTest extends UnitTestCase
         $this->assertNull($this->passwordEntityListener->createPasswordHistory($this->emMock, $this->entityMock, null));
     }
 
-    public function testCreatePasswordHistoryBadInstance()
+    public function testCreatePasswordHistoryBadInstance(): void
     {
         $this->uowMock->shouldNotReceive('computeChangeSets');
 
@@ -236,7 +237,7 @@ class PasswordEntityListenerTest extends UnitTestCase
         $this->passwordEntityListener->createPasswordHistory($this->emMock, $this->entityMock, 'old_pwd');
     }
 
-    public function testCreatePasswordHistoryBadSetter()
+    public function testCreatePasswordHistoryBadSetter(): void
     {
         $this->uowMock->shouldNotReceive('computeChangeSets');
 

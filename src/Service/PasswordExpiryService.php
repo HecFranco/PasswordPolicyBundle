@@ -4,6 +4,7 @@
 namespace HecFranco\PasswordPolicyBundle\Service;
 
 
+use DateTime;
 use HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface;
 use HecFranco\PasswordPolicyBundle\Model\PasswordExpiryConfiguration;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -14,7 +15,7 @@ class PasswordExpiryService implements PasswordExpiryServiceInterface
   /**
    * @var \HecFranco\PasswordPolicyBundle\Model\PasswordExpiryConfiguration[]
    */
-  private $entities;
+  private ?array $entities = null;
 
 
   /**
@@ -32,13 +33,13 @@ class PasswordExpiryService implements PasswordExpiryServiceInterface
   public function isPasswordExpired(): bool
   {
     /** @var HasPasswordPolicyInterface $user */
-    if ($user = $this->getCurrentUser()) {
+    if (($user = $this->getCurrentUser()) instanceof HasPasswordPolicyInterface) {
       foreach ($this->entities as $class => $config) {
         $passwordLastChange = $user->getPasswordChangedAt();
         if ($passwordLastChange && $user instanceof $class) {
           $expiresAt = (clone $passwordLastChange)->modify('+' . $config->getExpiryDays() . ' days');
 
-          return $expiresAt <= new \DateTime();
+          return $expiresAt <= new DateTime();
         }
       }
     }
@@ -127,7 +128,7 @@ class PasswordExpiryService implements PasswordExpiryServiceInterface
   private function prepareEntityClass(?string $entityClass): ?string
   {
     if (is_null($entityClass) && $user = $this->getCurrentUser()) {
-      $entityClass = get_class($user);
+      return get_class($user);
     }
 
     return $entityClass;

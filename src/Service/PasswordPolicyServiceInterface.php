@@ -4,7 +4,6 @@ namespace HecFranco\PasswordPolicyBundle\Service;
 
 use HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface;
 use HecFranco\PasswordPolicyBundle\Model\PasswordHistoryInterface;
-use Symfony\Component\Security\HecFranco\User\UserInterface;
 
 interface PasswordPolicyServiceInterface
 {

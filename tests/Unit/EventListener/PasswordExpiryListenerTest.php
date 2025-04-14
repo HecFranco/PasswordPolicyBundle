@@ -4,6 +4,7 @@
 namespace HecFranco\PasswordPolicyBundle\Tests\Unit\EventListener;
 
 
+use Mockery;
 use HecFranco\PasswordPolicyBundle\EventListener\PasswordExpiryListener;
 use HecFranco\PasswordPolicyBundle\Service\PasswordExpiryServiceInterface;
 use HecFranco\PasswordPolicyBundle\Tests\UnitTestCase;
@@ -32,9 +33,9 @@ class PasswordExpiryListenerTest extends UnitTestCase
     /**
      * Setup..
      */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->passwordExpiryServiceMock = \Mockery::mock(PasswordExpiryServiceInterface::class);
+        $this->passwordExpiryServiceMock = Mockery::mock(PasswordExpiryServiceInterface::class);
 
         $this->passwordExpiryServiceMock->shouldReceive('getLockedRoute')
                                         ->withNoArgs()
@@ -45,9 +46,9 @@ class PasswordExpiryListenerTest extends UnitTestCase
         $this->passwordExpiryServiceMock->shouldReceive('generateLockedRoute')
                                         ->andReturn('/locked');
 
-        $this->sessionMock = \Mockery::mock(Session::class);
+        $this->sessionMock = Mockery::mock(Session::class);
 
-        $this->passwordExpiryListenerMock = \Mockery::mock(PasswordExpiryListener::class, [
+        $this->passwordExpiryListenerMock = Mockery::mock(PasswordExpiryListener::class, [
             $this->passwordExpiryServiceMock,
             $this->sessionMock,
             'error',
@@ -55,9 +56,9 @@ class PasswordExpiryListenerTest extends UnitTestCase
         ])->makePartial();
     }
 
-    public function testOnKernelRequest()
+    public function testOnKernelRequest(): void
     {
-        $requestMock = \Mockery::mock(Request::class);
+        $requestMock = Mockery::mock(Request::class);
         $requestMock->shouldReceive('getPathInfo')
                     ->once()
                     ->andReturn('/route');
@@ -66,7 +67,7 @@ class PasswordExpiryListenerTest extends UnitTestCase
                     ->once()
                     ->andReturn('route');
 
-        $responseEventMock = \Mockery::mock(GetResponseEvent::class);
+        $responseEventMock = Mockery::mock(GetResponseEvent::class);
         $responseEventMock->shouldReceive('isMasterRequest')
                           ->andReturn(true);
         $responseEventMock->shouldReceive('getRequest')
@@ -74,7 +75,7 @@ class PasswordExpiryListenerTest extends UnitTestCase
 
         $responseEventMock->shouldReceive('setResponse')
                           ->once()
-                          ->andReturnUsing(function (RedirectResponse $response) {
+                          ->andReturnUsing(function (RedirectResponse $response): void {
                               $this->assertEquals($response->getTargetUrl(), '/locked');
                           });
 
@@ -82,7 +83,7 @@ class PasswordExpiryListenerTest extends UnitTestCase
                                         ->once()
                                         ->andReturnTrue();
 
-        $flashBagMock = \Mockery::mock(FlashBagInterface::class);
+        $flashBagMock = Mockery::mock(FlashBagInterface::class);
         $flashBagMock->shouldReceive('add')
                      ->once()
                      ->withArgs(['error', 'Your password expired. You need to change it']);
@@ -93,9 +94,9 @@ class PasswordExpiryListenerTest extends UnitTestCase
         $this->passwordExpiryListenerMock->onKernelRequest($responseEventMock);
     }
 
-    public function testOnKernelRequestAsLockedRoute()
+    public function testOnKernelRequestAsLockedRoute(): void
     {
-        $requestMock = \Mockery::mock(Request::class);
+        $requestMock = Mockery::mock(Request::class);
         $requestMock->shouldReceive('getPathInfo')
                     ->once()
                     ->andReturn('/locked');
@@ -104,7 +105,7 @@ class PasswordExpiryListenerTest extends UnitTestCase
                     ->once()
                     ->andReturn('/route');
 
-        $responseEventMock = \Mockery::mock(GetResponseEvent::class);
+        $responseEventMock = Mockery::mock(GetResponseEvent::class);
         $responseEventMock->shouldReceive('isMasterRequest')
                           ->andReturn(true);
         $responseEventMock->shouldReceive('getRequest')
@@ -117,9 +118,9 @@ class PasswordExpiryListenerTest extends UnitTestCase
         $this->assertTrue(true);
     }
 
-    public function testOnKernelRequestExcludedRoute()
+    public function testOnKernelRequestExcludedRoute(): void
     {
-        $requestMock = \Mockery::mock(Request::class);
+        $requestMock = Mockery::mock(Request::class);
         $requestMock->shouldReceive('getPathInfo')
                     ->once()
                     ->andReturn('/route');
@@ -128,7 +129,7 @@ class PasswordExpiryListenerTest extends UnitTestCase
                     ->once()
                     ->andReturn('/excluded-2');
 
-        $responseEventMock = \Mockery::mock(GetResponseEvent::class);
+        $responseEventMock = Mockery::mock(GetResponseEvent::class);
         $responseEventMock->shouldReceive('isMasterRequest')
                           ->andReturn(true);
         $responseEventMock->shouldReceive('getRequest')
@@ -141,9 +142,9 @@ class PasswordExpiryListenerTest extends UnitTestCase
         $this->assertTrue(true);
     }
 
-    public function testOnKernelRequestPasswordNotExpired()
+    public function testOnKernelRequestPasswordNotExpired(): void
     {
-        $requestMock = \Mockery::mock(Request::class);
+        $requestMock = Mockery::mock(Request::class);
         $requestMock->shouldReceive('getPathInfo')
                     ->once()
                     ->andReturn('/route');
@@ -152,7 +153,7 @@ class PasswordExpiryListenerTest extends UnitTestCase
                     ->once()
                     ->andReturn('/route');
 
-        $responseEventMock = \Mockery::mock(GetResponseEvent::class);
+        $responseEventMock = Mockery::mock(GetResponseEvent::class);
         $responseEventMock->shouldReceive('isMasterRequest')
                           ->andReturn(true);
         $responseEventMock->shouldReceive('getRequest')
@@ -167,9 +168,9 @@ class PasswordExpiryListenerTest extends UnitTestCase
         $this->assertTrue(true);
     }
 
-    public function testOnKernelRequestAsSubRequest()
+    public function testOnKernelRequestAsSubRequest(): void
     {
-        $responseEventMock = \Mockery::mock(GetResponseEvent::class);
+        $responseEventMock = Mockery::mock(GetResponseEvent::class);
         $responseEventMock->shouldReceive('isMasterRequest')
                           ->andReturn(false);
 

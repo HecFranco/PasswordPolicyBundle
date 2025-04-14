@@ -25,7 +25,7 @@ class PasswordHistoryService implements PasswordHistoryServiceInterface
         if ($len > $historyLimit) {
             $historyArray = $historyCollection->toArray();
 
-            usort($historyArray, function (PasswordHistoryInterface $a, PasswordHistoryInterface $b) {
+            usort($historyArray, function (PasswordHistoryInterface $a, PasswordHistoryInterface $b): int|float {
                 $aTs = $a->getCreatedAt()->format('U');
                 $bTs = $b->getCreatedAt()->format('U');
 

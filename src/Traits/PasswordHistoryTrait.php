@@ -4,6 +4,7 @@
 namespace HecFranco\PasswordPolicyBundle\Traits;
 
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 trait PasswordHistoryTrait
@@ -47,7 +48,7 @@ trait PasswordHistoryTrait
     /**
      * @return \DateTime|null
      */
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
@@ -55,7 +56,7 @@ trait PasswordHistoryTrait
     /**
      * @param \DateTime|null $createdAt
      */
-    public function setCreatedAt(?\DateTime $createdAt): void
+    public function setCreatedAt(?DateTime $createdAt): void
     {
         $this->createdAt = $createdAt;
     }
@@ -63,11 +64,11 @@ trait PasswordHistoryTrait
     /**
      * @ORM\PrePersist
      */
-    public function updatedTimestamps()
+    public function updatedTimestamps(): void
     {
 
         if ($this->getCreatedAt() == null) {
-            $this->setCreatedAt(new \DateTime('now'));
+            $this->setCreatedAt(new DateTime('now'));
         }
     }
 

@@ -9,22 +9,10 @@ use HecFranco\PasswordPolicyBundle\Exceptions\RuntimeException;
 class PasswordExpiryConfiguration
 {
 
-  /**
-   * @var string
-   */
-  private $entityClass;
-  /**
-   * @var int
-   */
-  private $expiryDays;
-  /**
-   * @var array
-   */
-  private $lockRoutes;
-  /**
-   * @var array
-   */
-  private $excludedRoutes;
+  private string $entityClass;
+  private int $expiryDays;
+  private array $lockRoutes;
+  private array $excludedRoutes;
 
   /**
    * PasswordExpiryConfiguration constructor.

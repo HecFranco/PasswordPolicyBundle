@@ -4,6 +4,8 @@
 namespace HecFranco\PasswordPolicyBundle\Tests\Unit\Service;
 
 
+use Mockery;
+use DateTime;
 use HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface;
 use HecFranco\PasswordPolicyBundle\Model\PasswordHistoryInterface;
 use HecFranco\PasswordPolicyBundle\Service\PasswordHistoryService;
@@ -21,13 +23,13 @@ class PasswordHistoryServiceTest extends UnitTestCase
      */
     private $entityMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->entityMock = \Mockery::mock(HasPasswordPolicyInterface::class);
-        $this->historyService = \Mockery::mock(PasswordHistoryService::class)->makePartial();
+        $this->entityMock = Mockery::mock(HasPasswordPolicyInterface::class);
+        $this->historyService = Mockery::mock(PasswordHistoryService::class)->makePartial();
     }
 
-    public function testCleanupHistory()
+    public function testCleanupHistory(): void
     {
         $passwordHistory = $this->getDummyPasswordHistory();
         $this->entityMock->shouldReceive('getPasswordHistory')
@@ -37,9 +39,7 @@ class PasswordHistoryServiceTest extends UnitTestCase
 
         $this->assertCount(7, $deletedItems);
 
-        $actualTimestamps = array_map(function (PasswordHistoryInterface $item) {
-            return $item->getCreatedAt()->format('U');
-        }, $deletedItems);
+        $actualTimestamps = array_map(fn(PasswordHistoryInterface $item) => $item->getCreatedAt()->format('U'), $deletedItems);
 
         $expectedTimestamps = [];
 
@@ -51,7 +51,7 @@ class PasswordHistoryServiceTest extends UnitTestCase
         $this->assertEquals($expectedTimestamps, $actualTimestamps);
     }
 
-    public function testCleanupHistoryNoNeed()
+    public function testCleanupHistoryNoNeed(): void
     {
         $passwordHistory = $this->getDummyPasswordHistory();
 
@@ -72,9 +72,9 @@ class PasswordHistoryServiceTest extends UnitTestCase
 
             $time += $i * 100;
 
-            $collection->add(\Mockery::mock(PasswordHistoryInterface::class)
+            $collection->add(Mockery::mock(PasswordHistoryInterface::class)
                                      ->shouldReceive('getCreatedAt')
-                                     ->andReturn((new \DateTime())->setTimestamp($time))
+                                     ->andReturn((new DateTime())->setTimestamp($time))
                                      ->getMock());
         }
 

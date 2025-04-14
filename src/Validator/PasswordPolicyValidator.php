@@ -15,10 +15,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 class PasswordPolicyValidator extends ConstraintValidator
 {
 
-    /**
-     * @var PasswordPolicyServiceInterface
-     */
-    private $passwordPolicyService;
+    private PasswordPolicyServiceInterface $passwordPolicyService;
     /**
      * @var \Symfony\Component\Translation\TranslatorInterface
      */

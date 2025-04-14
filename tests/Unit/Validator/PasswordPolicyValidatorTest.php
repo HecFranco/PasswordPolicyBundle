@@ -4,6 +4,8 @@
 namespace HecFranco\PasswordPolicyBundle\Tests\Unit\Validator;
 
 
+use Mockery;
+use DateTime;
 use HecFranco\PasswordPolicyBundle\Exceptions\ValidationException;
 use HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface;
 use HecFranco\PasswordPolicyBundle\Model\PasswordHistoryInterface;
@@ -41,22 +43,22 @@ class PasswordPolicyValidatorTest extends UnitTestCase
   /**
    * Setup.
    */
-  protected function setUp()
+  protected function setUp(): void
   {
-    $this->translatorMock = \Mockery::mock(TranslatorInterface::class);
+    $this->translatorMock = Mockery::mock(TranslatorInterface::class);
     $this->translatorMock->shouldReceive('getLocale')
       ->andReturn('en');
 
-    $this->passwordPolicyServiceMock = \Mockery::mock(PasswordPolicyServiceInterface::class);
-    $this->validator = \Mockery::mock(PasswordPolicyValidator::class, [
+    $this->passwordPolicyServiceMock = Mockery::mock(PasswordPolicyServiceInterface::class);
+    $this->validator = Mockery::mock(PasswordPolicyValidator::class, [
       $this->passwordPolicyServiceMock,
       $this->translatorMock,
     ])->makePartial();
-    $this->contextMock = \Mockery::mock(ExecutionContextInterface::class);
-    $this->entityMock = \Mockery::mock(HasPasswordPolicyInterface::class);
+    $this->contextMock = Mockery::mock(ExecutionContextInterface::class);
+    $this->entityMock = Mockery::mock(HasPasswordPolicyInterface::class);
   }
 
-  public function testValidatePass()
+  public function testValidatePass(): void
   {
     $this->contextMock->shouldReceive('getObject')
       ->once()
@@ -72,13 +74,13 @@ class PasswordPolicyValidatorTest extends UnitTestCase
     $this->assertTrue($this->validator->validate('pwd', $constraint));
   }
 
-  public function testValidateFail()
+  public function testValidateFail(): void
   {
     $this->contextMock->shouldReceive('getObject')
       ->once()
       ->andReturn($this->entityMock);
 
-    $constraintBuilderMock = \Mockery::mock(ConstraintViolationBuilderInterface::class);
+    $constraintBuilderMock = Mockery::mock(ConstraintViolationBuilderInterface::class);
 
     $constraintBuilderMock->shouldReceive('setParameter')
       ->once()
@@ -97,9 +99,9 @@ class PasswordPolicyValidatorTest extends UnitTestCase
 
     $constraint = new PasswordPolicy();
 
-    $historyMock = \Mockery::mock(PasswordHistoryInterface::class);
+    $historyMock = Mockery::mock(PasswordHistoryInterface::class);
     $historyMock->shouldReceive('getCreatedAt')
-      ->andReturn(new \DateTime('-2 days'));
+      ->andReturn(new DateTime('-2 days'));
 
     $this->passwordPolicyServiceMock->shouldReceive('getHistoryByPassword')
       ->withArgs(['pwd', $this->entityMock])
@@ -109,12 +111,12 @@ class PasswordPolicyValidatorTest extends UnitTestCase
     $this->assertFalse($this->validator->validate('pwd', $constraint));
   }
 
-  public function testValidateNullValue()
+  public function testValidateNullValue(): void
   {
     $this->assertTrue($this->validator->validate(null, new PasswordPolicy()));
   }
 
-  public function testValidateBadEntity()
+  public function testValidateBadEntity(): void
   {
     $this->contextMock->shouldReceive('getObject')
       ->once()

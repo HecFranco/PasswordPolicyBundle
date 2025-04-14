@@ -19,7 +19,7 @@ class PasswordHistoryMock implements PasswordHistoryInterface
     /**
      * @param $user
      */
-    public function setUser($user)
+    public function setUser($user): void
     {
         $this->user = $user;
     }

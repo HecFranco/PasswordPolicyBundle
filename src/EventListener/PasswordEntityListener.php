@@ -3,11 +3,9 @@
 
 namespace HecFranco\PasswordPolicyBundle\EventListener;
 
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping as ORM;
-// events
-use Doctrine\ORM\Event\PrePersistEventArgs;
-use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
 // attributes
@@ -21,33 +19,15 @@ use HecFranco\PasswordPolicyBundle\Service\PasswordHistoryServiceInterface;
 #[AsDoctrineListener(event: Events::onFlush, priority: 500, connection: 'default')]
 class PasswordEntityListener
 {
-  /**
-   * @var string
-   */
-  private $passwordField;
-  /**
-   * @var string
-   */
-  private $passwordHistoryField;
-  /**
-   * @var int
-   */
-  private $historyLimit;
+  private string $passwordField;
+  private string $passwordHistoryField;
+  private int $historyLimit;
 
-  /**
-   * @var string
-   */
-  private $entityClass;
+  private string $entityClass;
 
-  /**
-   * @var array
-   */
-  private $processedNewEntities = [];
+  private array $processedNewEntities = [];
 
-  /**
-   * @var array
-   */
-  private $processedPasswords = [];
+  private array $processedPasswords = [];
 
   /**
    * PasswordEntityListener constructor.
@@ -115,7 +95,7 @@ class PasswordEntityListener
       $oldPassword = $entity->getPassword();
     }
     //
-    if (!$oldPassword) {
+    if ($oldPassword === '' || $oldPassword === '0') {
       return null;
     }
     //
@@ -151,7 +131,7 @@ class PasswordEntityListener
     //
     $history->$userSetter($entity);
     $history->setPassword($oldPassword);
-    $history->setCreatedAt(new \DateTime());
+    $history->setCreatedAt(new DateTime());
     // $history->setSalt($entity->getSalt());
     //
     $entity->addPasswordHistory($history);
@@ -169,7 +149,7 @@ class PasswordEntityListener
     $metadata = $em->getClassMetadata($historyClass);
     $unitOfWork->computeChangeSet($metadata, $history);
 
-    $entity->setPasswordChangedAt(new \DateTime());
+    $entity->setPasswordChangedAt(new DateTime());
     // We need to recompute the change set so we won't trigger updates instead of inserts.
     $unitOfWork->recomputeSingleEntityChangeSet($entityMeta, $entity);
 

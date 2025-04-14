@@ -4,6 +4,7 @@
 namespace HecFranco\PasswordPolicyBundle\Tests\Unit\Service;
 
 
+use Mockery;
 use HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface;
 use HecFranco\PasswordPolicyBundle\Service\PasswordPolicyService;
 use HecFranco\PasswordPolicyBundle\Service\PasswordPolicyServiceInterface;
@@ -31,20 +32,20 @@ class PasswordPolicyServiceTest extends UnitTestCase
     /**
      *
      */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->passwordEncoderFactoryMock = \Mockery::mock(EncoderFactoryInterface::class);
-        $this->passwordPolicyServiceMock = \Mockery::mock(PasswordPolicyService::class, [
+        $this->passwordEncoderFactoryMock = Mockery::mock(EncoderFactoryInterface::class);
+        $this->passwordPolicyServiceMock = Mockery::mock(PasswordPolicyService::class, [
             $this->passwordEncoderFactoryMock,
         ])->makePartial();
 
-        $this->entityMock = \Mockery::mock(HasPasswordPolicyInterface::class);
+        $this->entityMock = Mockery::mock(HasPasswordPolicyInterface::class);
 
     }
 
-    public function testGetHistoryByPasswordMatch()
+    public function testGetHistoryByPasswordMatch(): void
     {
-        $encoderMock = \Mockery::mock(PasswordEncoderInterface::class);
+        $encoderMock = Mockery::mock(PasswordEncoderInterface::class);
         $encoderMock->shouldReceive('isPasswordValid')
                     ->twice()
                     ->andReturn(false, true);
@@ -65,9 +66,9 @@ class PasswordPolicyServiceTest extends UnitTestCase
         $this->assertEquals($history[1], $actual);
     }
 
-    public function testGetHistoryByPasswordNoMatch()
+    public function testGetHistoryByPasswordNoMatch(): void
     {
-        $encoderMock = \Mockery::mock(PasswordEncoderInterface::class);
+        $encoderMock = Mockery::mock(PasswordEncoderInterface::class);
         $encoderMock->shouldReceive('isPasswordValid')
                     ->twice()
                     ->andReturn(false, false);
@@ -89,9 +90,9 @@ class PasswordPolicyServiceTest extends UnitTestCase
         $this->assertNull($actual);
     }
 
-    public function testGetHistoryByPasswordEmptyHistory()
+    public function testGetHistoryByPasswordEmptyHistory(): void
     {
-        $encoderMock = \Mockery::mock(PasswordEncoderInterface::class);
+        $encoderMock = Mockery::mock(PasswordEncoderInterface::class);
         $encoderMock->shouldNotReceive('isPasswordValid');
 
         $this->passwordPolicyServiceMock->shouldReceive('getEncoder')
@@ -113,7 +114,7 @@ class PasswordPolicyServiceTest extends UnitTestCase
      */
     private function makePasswordHistoryMock()
     {
-        return \Mockery::mock(PasswordHistoryMock::class)
+        return Mockery::mock(PasswordHistoryMock::class)
                        ->shouldReceive('getPassword')
                        ->once()
                        ->andReturn('pwd')

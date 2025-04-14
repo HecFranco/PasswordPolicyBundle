@@ -4,6 +4,7 @@
 namespace HecFranco\PasswordPolicyBundle\Tests\Unit\Service;
 
 
+use Mockery\Mock;
 use Mockery;
 use DateTime;
 use HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface;
@@ -15,11 +16,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 class PasswordHistoryServiceTest extends UnitTestCase
 {
     /**
-     * @var \HecFranco\PasswordPolicyBundle\Service\PasswordHistoryService|\Mockery\Mock
+     * @var PasswordHistoryService|Mock
      */
     private $historyService;
     /**
-     * @var \HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface|\Mockery\Mock
+     * @var HasPasswordPolicyInterface|Mock
      */
     private $entityMock;
 

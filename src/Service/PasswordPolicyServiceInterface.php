@@ -9,8 +9,8 @@ interface PasswordPolicyServiceInterface
 {
     /**
      * @param string $password
-     * @param \HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface $entity
-     * @return \HecFranco\PasswordPolicyBundle\Model\PasswordHistoryInterface|null
+     * @param HasPasswordPolicyInterface $entity
+     * @return PasswordHistoryInterface|null
      */
     public function getHistoryByPassword(
         string $password,

@@ -4,6 +4,8 @@
 namespace HecFranco\PasswordPolicyBundle\Tests\Unit\Service;
 
 
+use Mockery\Mock;
+use HecFranco\PasswordPolicyBundle\Exceptions\RuntimeException;
 use Mockery;
 use DateTime;
 use HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface;
@@ -18,22 +20,22 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 class PasswordExpiryServiceTest extends UnitTestCase
 {
     /**
-     * @var \HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface|\Mockery\Mock
+     * @var HasPasswordPolicyInterface|Mock
      */
     protected $userMock;
 
     /**
-     * @var \Symfony\Component\Routing\Generator\UrlGeneratorInterface|\Mockery\Mock
+     * @var UrlGeneratorInterface|Mock
      */
     protected $routerMock;
 
     /**
-     * @var PasswordExpiryServiceInterface|\Mockery\Mock
+     * @var PasswordExpiryServiceInterface|Mock
      */
     private $passwordExpiryServiceMock;
 
     /**
-     * @var \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage|\Mockery\Mock
+     * @var \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage|Mock
      */
     private $tokenStorageMock;
 
@@ -49,7 +51,7 @@ class PasswordExpiryServiceTest extends UnitTestCase
     }
 
     /**
-     * @throws \HecFranco\PasswordPolicyBundle\Exceptions\RuntimeException
+     * @throws RuntimeException
      */
     public function testIsPasswordExpired(): void
     {
@@ -68,7 +70,7 @@ class PasswordExpiryServiceTest extends UnitTestCase
                                ->andReturn($tokenMock);
 
         $this->passwordExpiryServiceMock->addEntity(
-            new PasswordExpiryConfiguration(get_class($this->userMock), 90, 'lock')
+            new PasswordExpiryConfiguration($this->userMock::class, 90, 'lock')
         );
 
         $this->assertTrue($this->passwordExpiryServiceMock->isPasswordExpired());
@@ -86,7 +88,7 @@ class PasswordExpiryServiceTest extends UnitTestCase
                                ->andReturn($tokenMock);
 
         $this->passwordExpiryServiceMock->addEntity(
-            new PasswordExpiryConfiguration(get_class($this->userMock), 90, 'lock', ['id' => 1])
+            new PasswordExpiryConfiguration($this->userMock::class, 90, 'lock', ['id' => 1])
         );
 
         $this->routerMock->shouldReceive('generate')

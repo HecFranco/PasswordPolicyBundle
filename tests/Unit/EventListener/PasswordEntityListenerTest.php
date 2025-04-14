@@ -4,6 +4,7 @@
 namespace HecFranco\PasswordPolicyBundle\Tests\Unit\EventListener;
 
 
+use Mockery\Mock;
 use Mockery;
 use HecFranco\PasswordPolicyBundle\EventListener\PasswordEntityListener;
 use HecFranco\PasswordPolicyBundle\Exceptions\RuntimeException;
@@ -21,24 +22,24 @@ class PasswordEntityListenerTest extends UnitTestCase
 {
 
     /**
-     * @var \HecFranco\PasswordPolicyBundle\Service\PasswordHistoryServiceInterface|\Mockery\Mock
+     * @var PasswordHistoryServiceInterface|Mock
      */
     private $passwordHistoryServiceMock;
 
     /**
-     * @var \HecFranco\PasswordPolicyBundle\EventListener\PasswordEntityListener|\Mockery\Mock
+     * @var PasswordEntityListener|Mock
      */
     private $passwordEntityListener;
     /**
-     * @var \Doctrine\ORM\EntityManagerInterface|\Mockery\Mock
+     * @var \Doctrine\ORM\EntityManagerInterface|Mock
      */
     private $emMock;
     /**
-     * @var \HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface|\Mockery\Mock
+     * @var HasPasswordPolicyInterface|Mock
      */
     private $entityMock;
     /**
-     * @var \Doctrine\ORM\UnitOfWork|\Mockery\Mock
+     * @var \Doctrine\ORM\UnitOfWork|Mock
      */
     private $uowMock;
 
@@ -57,12 +58,12 @@ class PasswordEntityListenerTest extends UnitTestCase
             'password',
             'passwordHistory',
             '3',
-            get_class($this->entityMock),
+            $this->entityMock::class,
         ])->makePartial();
     }
 
     /**
-     * @throws \HecFranco\PasswordPolicyBundle\Exceptions\RuntimeException
+     * @throws RuntimeException
      */
     public function testOnFlushUpdates(): void
     {
@@ -108,7 +109,7 @@ class PasswordEntityListenerTest extends UnitTestCase
 
         $this->emMock->shouldReceive('getClassMetadata')
                      ->once()
-                     ->withArgs([get_class($this->entityMock)])
+                     ->withArgs([$this->entityMock::class])
                      ->andReturn($classMetadata);
 
         $this->entityMock->shouldReceive('addPasswordHistory')
@@ -228,7 +229,7 @@ class PasswordEntityListenerTest extends UnitTestCase
 
         $this->emMock->shouldReceive('getClassMetadata')
                      ->once()
-                     ->withArgs([get_class($this->entityMock)])
+                     ->withArgs([$this->entityMock::class])
                      ->andReturn($classMetadata);
 
         $this->expectException(RuntimeException::class);
@@ -252,7 +253,7 @@ class PasswordEntityListenerTest extends UnitTestCase
 
         $this->emMock->shouldReceive('getClassMetadata')
                      ->once()
-                     ->withArgs([get_class($this->entityMock)])
+                     ->withArgs([$this->entityMock::class])
                      ->andReturn($classMetadata);
 
         $this->expectException(RuntimeException::class);

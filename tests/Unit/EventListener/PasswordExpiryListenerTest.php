@@ -4,6 +4,7 @@
 namespace HecFranco\PasswordPolicyBundle\Tests\Unit\EventListener;
 
 
+use Mockery\Mock;
 use Mockery;
 use HecFranco\PasswordPolicyBundle\EventListener\PasswordExpiryListener;
 use HecFranco\PasswordPolicyBundle\Service\PasswordExpiryServiceInterface;
@@ -17,16 +18,16 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 class PasswordExpiryListenerTest extends UnitTestCase
 {
     /**
-     * @var \Symfony\Component\HttpFoundation\Session\Session|\Mockery\Mock
+     * @var Session|Mock
      */
     private $sessionMock;
 
     /**
-     * @var \HecFranco\PasswordPolicyBundle\EventListener\PasswordExpiryListener|\Mockery\Mock
+     * @var PasswordExpiryListener|Mock
      */
     private $passwordExpiryListenerMock;
     /**
-     * @var PasswordExpiryServiceInterface|\Mockery\Mock
+     * @var PasswordExpiryServiceInterface|Mock
      */
     private $passwordExpiryServiceMock;
 

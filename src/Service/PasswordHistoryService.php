@@ -10,7 +10,7 @@ use HecFranco\PasswordPolicyBundle\Model\PasswordHistoryInterface;
 class PasswordHistoryService implements PasswordHistoryServiceInterface
 {
     /**
-     * @param \HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface $entity
+     * @param HasPasswordPolicyInterface $entity
      * @param int $historyLimit
      *
      * @return array Removed items

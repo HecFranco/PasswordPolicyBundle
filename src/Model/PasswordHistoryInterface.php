@@ -2,6 +2,7 @@
 
 namespace HecFranco\PasswordPolicyBundle\Model;
 
+use DateTime;
 use DateTimeInterface;
 
 interface PasswordHistoryInterface
@@ -18,13 +19,13 @@ interface PasswordHistoryInterface
   public function setPassword(string $password): self;
 
   /**
-   * @return \DateTime
+   * @return DateTime
    */
   public function getCreatedAt(): ?DateTimeInterface;
 
   /**
-   * @param \DateTime $dateTime
-   * @return \DateTime|null
+   * @param DateTime $dateTime
+   * @return DateTime|null
    */
   public function setCreatedAt(DateTimeInterface $createdAt): self;
 }

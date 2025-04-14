@@ -7,7 +7,7 @@ use HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface;
 interface PasswordHistoryServiceInterface
 {
     /**
-     * @param \HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface $entity
+     * @param HasPasswordPolicyInterface $entity
      * @param int $historyLimit
      * @return array
      */

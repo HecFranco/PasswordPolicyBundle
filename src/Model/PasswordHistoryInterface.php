@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace HecFranco\PasswordPolicyBundle\Model;
 
 use DateTime;
@@ -8,14 +10,8 @@ use DateTimeInterface;
 interface PasswordHistoryInterface
 {
 
-  /**
-   * @return string
-   */
   public function getPassword(): string;
 
-  /**
-   * @param string $password
-   */
   public function setPassword(string $password): self;
 
   /**

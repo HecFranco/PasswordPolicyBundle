@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
 
 namespace HecFranco\PasswordPolicyBundle\Tests;
 
 
+use Carbon\Carbon;
 use Mockery;
 use DateTime;
 use PHPUnit\Framework\TestCase;
@@ -20,7 +22,7 @@ class UnitTestCase extends TestCase
     {
         $timestamp = random_int($startDate, $endDate);
 
-        return (new DateTime())->setTimestamp($timestamp);
+        return (Carbon::now())->setTimestamp($timestamp);
     }
 
 }

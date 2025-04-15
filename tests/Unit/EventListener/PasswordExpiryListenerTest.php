@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace HecFranco\PasswordPolicyBundle\Tests\Unit\EventListener;
 
@@ -15,7 +16,7 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
-class PasswordExpiryListenerTest extends UnitTestCase
+final class PasswordExpiryListenerTest extends UnitTestCase
 {
     /**
      * @var Session|Mock
@@ -26,6 +27,7 @@ class PasswordExpiryListenerTest extends UnitTestCase
      * @var PasswordExpiryListener|Mock
      */
     private $passwordExpiryListenerMock;
+
     /**
      * @var PasswordExpiryServiceInterface|Mock
      */
@@ -76,8 +78,8 @@ class PasswordExpiryListenerTest extends UnitTestCase
 
         $responseEventMock->shouldReceive('setResponse')
                           ->once()
-                          ->andReturnUsing(function (RedirectResponse $response): void {
-                              $this->assertEquals($response->getTargetUrl(), '/locked');
+                          ->andReturnUsing(function (RedirectResponse $redirectResponse): void {
+                              $this->assertSame('/locked', $redirectResponse->getTargetUrl());
                           });
 
         $this->passwordExpiryServiceMock->shouldReceive('isPasswordExpired')

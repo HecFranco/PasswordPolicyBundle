@@ -1,24 +1,26 @@
 <?php
 
+declare(strict_types=1);
 
 namespace HecFranco\PasswordPolicyBundle\Tests\Unit\Service;
 
 
+use Carbon\Carbon;
 use Mockery\Mock;
 use Mockery;
-use DateTime;
 use HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface;
 use HecFranco\PasswordPolicyBundle\Model\PasswordHistoryInterface;
 use HecFranco\PasswordPolicyBundle\Service\PasswordHistoryService;
 use HecFranco\PasswordPolicyBundle\Tests\UnitTestCase;
 use Doctrine\Common\Collections\ArrayCollection;
 
-class PasswordHistoryServiceTest extends UnitTestCase
+final class PasswordHistoryServiceTest extends UnitTestCase
 {
     /**
      * @var PasswordHistoryService|Mock
      */
     private $historyService;
+
     /**
      * @var HasPasswordPolicyInterface|Mock
      */
@@ -32,20 +34,20 @@ class PasswordHistoryServiceTest extends UnitTestCase
 
     public function testCleanupHistory(): void
     {
-        $passwordHistory = $this->getDummyPasswordHistory();
+        $arrayCollection = $this->getDummyPasswordHistory();
         $this->entityMock->shouldReceive('getPasswordHistory')
-                         ->andReturn($passwordHistory);
+                         ->andReturn($arrayCollection);
 
         $deletedItems = $this->historyService->getHistoryItemsForCleanup($this->entityMock, 3);
 
         $this->assertCount(7, $deletedItems);
 
-        $actualTimestamps = array_map(fn(PasswordHistoryInterface $item) => $item->getCreatedAt()->format('U'), $deletedItems);
+        $actualTimestamps = array_map(fn(PasswordHistoryInterface $passwordHistory) => $passwordHistory->getCreatedAt()->format('U'), $deletedItems);
 
         $expectedTimestamps = [];
 
-        for ($i = 6; $i >= 0; $i--) {
-            $expectedTimestamps[] = $passwordHistory->offsetGet($i)->getCreatedAt()->format('U');
+        for ($i = 6; $i >= 0; --$i) {
+            $expectedTimestamps[] = $arrayCollection->offsetGet($i)->getCreatedAt()->format('U');
         }
 
 
@@ -54,10 +56,10 @@ class PasswordHistoryServiceTest extends UnitTestCase
 
     public function testCleanupHistoryNoNeed(): void
     {
-        $passwordHistory = $this->getDummyPasswordHistory();
+        $arrayCollection = $this->getDummyPasswordHistory();
 
         $this->entityMock->shouldReceive('getPasswordHistory')
-                         ->andReturn($passwordHistory);
+                         ->andReturn($arrayCollection);
 
         $deletedItems = $this->historyService->getHistoryItemsForCleanup($this->entityMock, 20);
 
@@ -66,20 +68,20 @@ class PasswordHistoryServiceTest extends UnitTestCase
 
     private function getDummyPasswordHistory(): ArrayCollection
     {
-        $collection = new ArrayCollection();
-        $time = time();
+        $arrayCollection = new ArrayCollection();
+        $time = Carbon::now()->getTimestamp();
 
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 10; ++$i) {
 
             $time += $i * 100;
 
-            $collection->add(Mockery::mock(PasswordHistoryInterface::class)
+            $arrayCollection->add(Mockery::mock(PasswordHistoryInterface::class)
                                      ->shouldReceive('getCreatedAt')
-                                     ->andReturn((new DateTime())->setTimestamp($time))
+                                     ->andReturn((Carbon::now())->setTimestamp($time))
                                      ->getMock());
         }
 
-        return $collection;
+        return $arrayCollection;
     }
 
 

@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace HecFranco\PasswordPolicyBundle\Model;
 
@@ -23,24 +24,12 @@ interface HasPasswordPolicyInterface
    */
   public function getPasswordChangedAt(): ?DateTime;
 
-  /**
-   * @param DateTime $dateTime
-   */
   public function setPasswordChangedAt(DateTime $dateTime): self;
 
-  /**
-   * @return \Doctrine\Common\Collections\Collection
-   */
   public function getPasswordHistory(): Collection;
 
-  /**
-   * @param PasswordHistoryInterface $passwordHistory
-   */
   public function addPasswordHistory(PasswordHistoryInterface $passwordHistory): static;
 
-  /**
-   * @return mixed
-   */
   public function getPassword(): string;
 
 }

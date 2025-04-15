@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace HecFranco\PasswordPolicyBundle\DependencyInjection;
 
@@ -10,17 +11,24 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class Configuration implements ConfigurationInterface
 {
   public const ALIAS = 'hec_franco_password_policy';
+
   // 
   private const DEFAULT_PASSWORD_FIELD = 'password';
+
   private const DEFAULT_PASSWORD_HISTORY_FIELD = 'passwordHistory';
+
   private const DEFAULT_PASSWORDS_TO_REMEMBER = 3;
+
   private const DEFAULT_EXPIRY_LISTENER_PRIORITY = 0;
+
   private const DEFAULT_EXPIRY_DAYS = 90;
+
   //
   private const DEFAULT_ERROR_MSG = [
     'title' => self::ALIAS.'.title',
     'message' => self::ALIAS.'.message'
   ];
+
   private const DEFAULT_ERROR_TYPE = 'error';
 
   /**
@@ -38,6 +46,7 @@ class Configuration implements ConfigurationInterface
       // BC layer for symfony/config 4.1 and older
       $rootNode = $treeBuilder->root(self::ALIAS);
     }
+
     // @formatter:off
     $rootNode->fixXmlConfig('entity')
       ->children()

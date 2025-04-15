@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace HecFranco\PasswordPolicyBundle\Service;
 
@@ -10,14 +11,12 @@ use HecFranco\PasswordPolicyBundle\Model\PasswordHistoryInterface;
 class PasswordHistoryService implements PasswordHistoryServiceInterface
 {
     /**
-     * @param HasPasswordPolicyInterface $entity
-     * @param int $historyLimit
      *
      * @return array Removed items
      */
-    public function getHistoryItemsForCleanup(HasPasswordPolicyInterface $entity, int $historyLimit): array
+    public function getHistoryItemsForCleanup(HasPasswordPolicyInterface $hasPasswordPolicy, int $historyLimit): array
     {
-        $historyCollection = $entity->getPasswordHistory();
+        $historyCollection = $hasPasswordPolicy->getPasswordHistory();
 
         $len = $historyCollection->count();
         $removedItems = [];
@@ -26,16 +25,16 @@ class PasswordHistoryService implements PasswordHistoryServiceInterface
             $historyArray = $historyCollection->toArray();
 
             usort($historyArray, function (PasswordHistoryInterface $a, PasswordHistoryInterface $b): int|float {
-                $aTs = $a->getCreatedAt()->format('U');
-                $bTs = $b->getCreatedAt()->format('U');
+                $aTs = $a->getCreatedAt()->format(format: 'U');
+                $bTs = $b->getCreatedAt()->format(format: 'U');
 
                 return $bTs - $aTs;
             });
 
-            $historyForCleanup = array_slice($historyArray, $historyLimit);
+            $historyForCleanup = array_slice(array: $historyArray, offset: $historyLimit);
 
             foreach ($historyForCleanup as $item) {
-                $removedItems[] = $item;
+                $hasPasswordPolicy->removePasswordHistory($item);
             }
         }
 

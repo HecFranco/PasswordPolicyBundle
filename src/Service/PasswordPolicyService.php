@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace HecFranco\PasswordPolicyBundle\Service;
 
@@ -14,27 +15,25 @@ class PasswordPolicyService implements PasswordPolicyServiceInterface
 
     /**
      * PasswordPolicyEnforcerService constructor.
-     * @param \Symfony\Component\Security\HecFranco\Encoder\EncoderFactoryInterface $encoderFactory
+     * @param \Symfony\Component\Security\HecFranco\Hasher\UserPasswordHasherInterface $userPasswordHasher
      */
-    public function __construct(public UserPasswordHasherInterface $hasher)
+    public function __construct(public UserPasswordHasherInterface $userPasswordHasher)
     {
     }
 
     /**
-     * @param string $password
      * @param HasPasswordPolicyInterface $entity
-     * @return PasswordHistoryInterface|null
      */
     public function getHistoryByPassword(
         string $password,
-        HasPasswordPolicyInterface $user
+        HasPasswordPolicyInterface $hasPasswordPolicy
     ): ?PasswordHistoryInterface {
-        $history = $user->getPasswordHistory();
+        $collection = $hasPasswordPolicy->getPasswordHistory();
 
-        $encoder = $this->getEncoder($user, $password);
+        $userPasswordHasher = $this->getEncoder(hasPasswordPolicy: $hasPasswordPolicy, password: $password);
 
-        foreach ($history as $passwordHistory) {
-            if ($encoder->isPasswordValid($passwordHistory->getPassword(), $password, $passwordHistory->getSalt())) {
+        foreach ($collection as $passwordHistory) {
+            if ($userPasswordHasher->isPasswordValid($passwordHistory->getPassword(), $password, $passwordHistory->getSalt())) {
                 return $passwordHistory;
             }
         }
@@ -46,11 +45,12 @@ class PasswordPolicyService implements PasswordPolicyServiceInterface
      * @param HasPasswordPolicyInterface $entity
      * @return \Symfony\Component\Security\HecFranco\Encoder\PasswordEncoderInterface
      */
-    public function getEncoder(HasPasswordPolicyInterface $user, string $password): UserPasswordHasherInterface
+    public function getEncoder(HasPasswordPolicyInterface $hasPasswordPolicy, string $password): UserPasswordHasherInterface
     {
-        if ($user instanceof UserInterface) {
-            return $this->hasher->hashPassword($user, $password);
+        if ($hasPasswordPolicy instanceof UserInterface) {
+            return $this->userPasswordHasher->hashPassword($hasPasswordPolicy, $password);
         }
+
         return new UserPasswordHasherInterface(3);
     }
 

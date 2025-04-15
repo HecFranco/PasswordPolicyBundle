@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
 
 namespace HecFranco\PasswordPolicyBundle\Tests\Unit\Service;
 
 
+use HecFranco\PasswordPolicyBundle\Model\PasswordHistoryInterface;
 use Mockery\Mock;
 use Mockery;
 use HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface;
@@ -15,29 +17,26 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Security\HecFranco\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\HecFranco\Encoder\PasswordEncoderInterface;
 
-class PasswordPolicyServiceTest extends UnitTestCase
+final class PasswordPolicyServiceTest extends UnitTestCase
 {
     /**
      * @var HasPasswordPolicyInterface|Mock
      */
     private $entityMock;
+
     /**
      * @var PasswordPolicyServiceInterface|Mock
      */
     private $passwordPolicyServiceMock;
-    /**
-     * @var \Symfony\Component\Security\HecFranco\Encoder\PasswordEncoderInterface|Mock
-     */
-    private $passwordEncoderFactoryMock;
 
     /**
      *
      */
     protected function setUp(): void
     {
-        $this->passwordEncoderFactoryMock = Mockery::mock(EncoderFactoryInterface::class);
+        $passwordEncoderFactoryMock = Mockery::mock(EncoderFactoryInterface::class);
         $this->passwordPolicyServiceMock = Mockery::mock(PasswordPolicyService::class, [
-            $this->passwordEncoderFactoryMock,
+            $passwordEncoderFactoryMock,
         ])->makePartial();
 
         $this->entityMock = Mockery::mock(HasPasswordPolicyInterface::class);
@@ -88,7 +87,7 @@ class PasswordPolicyServiceTest extends UnitTestCase
                          ->andReturn(new ArrayCollection($history));
 
         $actual = $this->passwordPolicyServiceMock->getHistoryByPassword('pwd', $this->entityMock);
-        $this->assertNull($actual);
+        $this->assertNotInstanceOf(PasswordHistoryInterface::class, $actual);
     }
 
     public function testGetHistoryByPasswordEmptyHistory(): void
@@ -107,7 +106,7 @@ class PasswordPolicyServiceTest extends UnitTestCase
 
 
         $actual = $this->passwordPolicyServiceMock->getHistoryByPassword('pwd', $this->entityMock);
-        $this->assertNull($actual);
+        $this->assertNotInstanceOf(PasswordHistoryInterface::class, $actual);
     }
 
     /**

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace HecFranco\PasswordPolicyBundle\EventListener;
 
 //
@@ -29,7 +31,7 @@ class PasswordExpiryListener
   public function __construct(
       public PasswordExpiryServiceInterface $passwordExpiryService,
       public SessionInterface $session,
-      public UrlGeneratorInterface $router,
+      public UrlGeneratorInterface $urlGenerator,
       public TranslatorInterface $translator,
       private readonly string $errorMessageType,
       /**
@@ -49,14 +51,14 @@ class PasswordExpiryListener
    *
    * @return The code returns either nothing (null) or a RedirectResponse object.
    */
-  public function onKernelRequest(RequestEvent $event): void
+  public function onKernelRequest(RequestEvent $requestEvent): void
   {
     //
-    if (!$event->isMainRequest()) {
+    if (!$requestEvent->isMainRequest()) {
       return;
     }
 
-    $request = $event->getRequest();
+    $request = $requestEvent->getRequest();
     $route = $request->get('_route');
     //
     $isLockedRoute = $this->passwordExpiryService->isLockedRoute($route);
@@ -64,6 +66,7 @@ class PasswordExpiryListener
     if (!$isLockedRoute) {
       return;
     }
+
     //
     $excludeRoutes = $this->passwordExpiryService->getExcludedRoutes();
     $isPasswordExpired = $this->passwordExpiryService->isPasswordExpired();
@@ -81,6 +84,7 @@ class PasswordExpiryListener
 
         $this->session->getFlashBag()->add($this->errorMessageType, $this->errorMessage);
       }
+
       // TODO: check if this is the correct way to get the reset password route name
       // $resetPasswordRouteName = $this->passwordExpiryService->getResetPasswordRouteName();
       // $resetPasswordUrl = $this->router->generate($resetPasswordRouteName);

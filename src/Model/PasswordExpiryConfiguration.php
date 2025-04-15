@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace HecFranco\PasswordPolicyBundle\Model;
 
@@ -13,10 +14,7 @@ class PasswordExpiryConfiguration
 
   /**
    * PasswordExpiryConfiguration constructor.
-   * @param string $class
-   * @param int $expiryDays
    * @param string $lockRoutes
-   * @param array $excludedRoutes
    */
   public function __construct(
     string $class,
@@ -31,20 +29,15 @@ class PasswordExpiryConfiguration
         HasPasswordPolicyInterface::class
       ));
     }
+
     $this->entityClass = $class;
   }
 
-  /**
-   * @return string
-   */
   public function getEntityClass(): string
   {
     return $this->entityClass;
   }
 
-  /**
-   * @return int
-   */
   public function getExpiryDays(): int
   {
     return $this->expiryDays;
@@ -58,9 +51,6 @@ class PasswordExpiryConfiguration
     return $this->lockRoutes;
   }
 
-  /**
-   * @return array
-   */
   public function getExcludedRoutes(): array
   {
     return $this->excludedRoutes;

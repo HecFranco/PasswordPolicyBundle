@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
 
 namespace HecFranco\PasswordPolicyBundle\Service;
 
 
+use Carbon\Carbon;
 use DateTime;
 use HecFranco\PasswordPolicyBundle\Model\HasPasswordPolicyInterface;
 use HecFranco\PasswordPolicyBundle\Model\PasswordExpiryConfiguration;
@@ -20,26 +22,21 @@ class PasswordExpiryService implements PasswordExpiryServiceInterface
 
   /**
    * PasswordExpiryService constructor.
-   * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
-   * @param UrlGeneratorInterface $router
    */
-  public function __construct(public TokenStorageInterface $tokenStorage, public UrlGeneratorInterface $router)
+  public function __construct(public TokenStorageInterface $tokenStorage, public UrlGeneratorInterface $urlGenerator)
   {
   }
 
-  /**
-   * @return bool
-   */
   public function isPasswordExpired(): bool
   {
     /** @var HasPasswordPolicyInterface $user */
     if (($user = $this->getCurrentUser()) instanceof HasPasswordPolicyInterface) {
       foreach ($this->entities as $class => $config) {
         $passwordLastChange = $user->getPasswordChangedAt();
-        if ($passwordLastChange && $user instanceof $class) {
+        if ($passwordLastChange instanceof DateTime && $user instanceof $class) {
           $expiresAt = (clone $passwordLastChange)->modify('+' . $config->getExpiryDays() . ' days');
 
-          return $expiresAt <= new DateTime();
+          return $expiresAt <= Carbon::now();
         }
       }
     }
@@ -49,12 +46,11 @@ class PasswordExpiryService implements PasswordExpiryServiceInterface
   }
 
   /**
-   * @param string $entityClass
    * @return string
    */
-  public function getLockedRoutes(string $entityClass = null): array
+  public function getLockedRoutes(?string $entityClass = null): array
   {
-    $entityClass = $this->prepareEntityClass($entityClass);
+    $entityClass = $this->prepareEntityClass(entityClass: $entityClass);
 
     return isset($this->entities[$entityClass]) ? $this->entities[$entityClass]->getLockRoutes() : [];
   }
@@ -71,42 +67,31 @@ class PasswordExpiryService implements PasswordExpiryServiceInterface
    * @return bool a boolean value. It returns true if the given route name is found in the array of
    * locked routes, and false otherwise.
    */
-  public function isLockedRoute(string $routeName, string $entityClass = null): bool
+  public function isLockedRoute(string $routeName, ?string $entityClass = null): bool
   {
-    $lockedRoutes = $this->getLockedRoutes($entityClass);
+    $lockedRoutes = $this->getLockedRoutes(entityClass: $entityClass);
     //
-    if (in_array($routeName, (array) $lockedRoutes)) {
-      return true;
-    }
     //
-    return false;
+    return in_array(needle: $routeName, haystack: $lockedRoutes);
   }
+
   public function getResetPasswordRouteName(): string
   {
 
   }
-  /**
-   * @param string $entityClass
-   * @return array
-   */
-  public function getExcludedRoutes(string $entityClass = null): array
+
+  public function getExcludedRoutes(?string $entityClass = null): array
   {
-    $entityClass = $this->prepareEntityClass($entityClass);
+    $entityClass = $this->prepareEntityClass(entityClass: $entityClass);
 
     return isset($this->entities[$entityClass]) ? $this->entities[$entityClass]->getExcludedRoutes() : [];
   }
 
-  /**
-   * @param PasswordExpiryConfiguration $configuration
-   */
-  public function addEntity(PasswordExpiryConfiguration $configuration): void
+  public function addEntity(PasswordExpiryConfiguration $passwordExpiryConfiguration): void
   {
-    $this->entities[$configuration->getEntityClass()] = $configuration;
+    $this->entities[$passwordExpiryConfiguration->getEntityClass()] = $passwordExpiryConfiguration;
   }
 
-  /**
-   * @return HasPasswordPolicyInterface|null
-   */
   private function getCurrentUser(): ?HasPasswordPolicyInterface
   {
     $token = $this->tokenStorage->getToken();

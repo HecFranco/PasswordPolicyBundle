@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
 
 namespace HecFranco\PasswordPolicyBundle\Traits;
 
 
+use DateTimeInterface;
+use Carbon\Carbon;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -11,51 +14,37 @@ trait PasswordHistoryTrait
 {
 
     /**
-     * @var string
      * @ORM\Column(type="string")
      * @ORM\Id()
      */
-    private $password;
+    private ?string $password = null;
 
     /**
-     * @var string|null
      * @ORM\Column(type="string", nullable=true)
      */
-    private $salt;
+    private ?string $salt = null;
 
     /**
      * @var DateTime|null
      * @ORM\Column(type="datetime")
      */
-    private $createdAt;
+    private ?DateTimeInterface $createdAt = null;
 
-    /**
-     * @return string
-     */
     public function getPassword(): string
     {
         return $this->password;
     }
 
-    /**
-     * @param string $password
-     */
     public function setPassword(string $password): void
     {
         $this->password = $password;
     }
 
-    /**
-     * @return DateTime|null
-     */
     public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    /**
-     * @param DateTime|null $createdAt
-     */
     public function setCreatedAt(?DateTime $createdAt): void
     {
         $this->createdAt = $createdAt;
@@ -68,21 +57,15 @@ trait PasswordHistoryTrait
     {
 
         if ($this->getCreatedAt() == null) {
-            $this->setCreatedAt(new DateTime('now'));
+            $this->setCreatedAt(Carbon::now());
         }
     }
 
-    /**
-     * @return null|string
-     */
     public function getSalt(): ?string
     {
         return $this->salt;
     }
 
-    /**
-     * @param null|string $salt
-     */
     public function setSalt(?string $salt): void
     {
         $this->salt = $salt;

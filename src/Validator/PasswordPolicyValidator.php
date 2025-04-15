@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace HecFranco\PasswordPolicyBundle\Validator;
 
@@ -16,14 +17,8 @@ use Symfony\Component\Validator\ConstraintValidator;
 class PasswordPolicyValidator extends ConstraintValidator
 {
 
-    /**
-     * @var \Symfony\Component\Translation\TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(private readonly PasswordPolicyServiceInterface $passwordPolicyService, TranslatorInterface $translator)
+    public function __construct(private readonly PasswordPolicyServiceInterface $passwordPolicyService, private TranslatorInterface $translator)
     {
-        $this->translator = $translator;
     }
 
     /**
@@ -43,13 +38,14 @@ class PasswordPolicyValidator extends ConstraintValidator
         $entity = $this->context->getObject();
 
         if (!$entity instanceof HasPasswordPolicyInterface) {
-            throw new ValidationException(sprintf('Expected validation entity to implements %s',
+            throw new ValidationException(message: sprintf('Expected validation entity to implements %s',
                 HasPasswordPolicyInterface::class));
         }
 
         Carbon::setLocale($this->translator->getLocale());
 
-        if (($history = $this->passwordPolicyService->getHistoryByPassword($value, $entity)) instanceof PasswordHistoryInterface) {
+        $history = $this->passwordPolicyService->getHistoryByPassword($value, $entity);
+        if ($history instanceof PasswordHistoryInterface) {
             $this->context->buildViolation($constraint->message)
                           ->setParameter('{{ days }}', Carbon::instance($history->getCreatedAt())->diffForHumans())
                           ->setCode(PasswordPolicy::PASSWORD_IN_HISTORY)

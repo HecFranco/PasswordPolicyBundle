@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
 
 namespace HecFranco\PasswordPolicyBundle\Tests\Unit\EventListener;
 
 
+use DateTime;
 use Mockery\Mock;
 use Mockery;
 use HecFranco\PasswordPolicyBundle\EventListener\PasswordEntityListener;
@@ -18,7 +20,7 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\UnitOfWork;
 
-class PasswordEntityListenerTest extends UnitTestCase
+final class PasswordEntityListenerTest extends UnitTestCase
 {
 
     /**
@@ -30,14 +32,17 @@ class PasswordEntityListenerTest extends UnitTestCase
      * @var PasswordEntityListener|Mock
      */
     private $passwordEntityListener;
+
     /**
      * @var \Doctrine\ORM\EntityManagerInterface|Mock
      */
     private $emMock;
+
     /**
      * @var HasPasswordPolicyInterface|Mock
      */
     private $entityMock;
+
     /**
      * @var \Doctrine\ORM\UnitOfWork|Mock
      */
@@ -89,9 +94,9 @@ class PasswordEntityListenerTest extends UnitTestCase
         $this->emMock->shouldReceive('getUnitOfWork')
                      ->andReturn($this->uowMock);
 
-        $event = new OnFlushEventArgs($this->emMock);
+        $onFlushEventArgs = new OnFlushEventArgs($this->emMock);
 
-        $this->passwordEntityListener->onFlush($event);
+        $this->passwordEntityListener->onFlush($onFlushEventArgs);
 
         $this->assertTrue(true);
     }
@@ -148,9 +153,10 @@ class PasswordEntityListenerTest extends UnitTestCase
                          ->once();
 
         $history = $this->passwordEntityListener->createPasswordHistory($this->emMock, $this->entityMock, 'old_pwd');
+        $this->assertInstanceof(PasswordHistoryInterface::class, $history);
 
-        $this->assertEquals($history->getPassword(), 'old_pwd');
-        $this->assertNotNull($history->getCreatedAt());
+        $this->assertSame('old_pwd', $history->getPassword());
+        $this->assertInstanceOf(DateTime::class, $history->getCreatedAt());
         $this->assertEquals($this->entityMock, $history->getUser());
         $this->assertEquals('salt', $history->getSalt());
     }
@@ -205,13 +211,14 @@ class PasswordEntityListenerTest extends UnitTestCase
                          ->andReturnValues(['pwd', null]);
 
         $history = $this->passwordEntityListener->createPasswordHistory($this->emMock, $this->entityMock, null);
+        $this->assertInstanceof(PasswordHistoryInterface::class, $history);
 
-        $this->assertEquals($history->getPassword(), 'pwd');
-        $this->assertNotNull($history->getCreatedAt());
+        $this->assertSame('pwd', $history->getPassword());
+        $this->assertInstanceOf(DateTime::class, $history->getCreatedAt());
         $this->assertEquals($this->entityMock, $history->getUser());
         $this->assertEquals('salt', $history->getSalt());
 
-        $this->assertNull($this->passwordEntityListener->createPasswordHistory($this->emMock, $this->entityMock, null));
+        $this->assertNotInstanceOf(PasswordHistoryInterface::class, $this->passwordEntityListener->createPasswordHistory($this->emMock, $this->entityMock, null));
     }
 
     public function testCreatePasswordHistoryBadInstance(): void
@@ -224,7 +231,7 @@ class PasswordEntityListenerTest extends UnitTestCase
 
         $classMetadata = new ClassMetadata('foo');
 
-        $classMetadata->associationMappings['passwordHistory']['targetEntity'] = static::class;
+        $classMetadata->associationMappings['passwordHistory']['targetEntity'] = self::class;
         $classMetadata->associationMappings['passwordHistory']['mappedBy'] = 'user';
 
         $this->emMock->shouldReceive('getClassMetadata')
@@ -233,7 +240,7 @@ class PasswordEntityListenerTest extends UnitTestCase
                      ->andReturn($classMetadata);
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage(static::class.' must implement '.PasswordHistoryInterface::class);
+        $this->expectExceptionMessage(self::class.' must implement '.PasswordHistoryInterface::class);
 
         $this->passwordEntityListener->createPasswordHistory($this->emMock, $this->entityMock, 'old_pwd');
     }

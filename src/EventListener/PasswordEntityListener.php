@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
 
 namespace HecFranco\PasswordPolicyBundle\EventListener;
 
-use DateTime;
+use Carbon\Carbon;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Event\OnFlushEventArgs;
@@ -19,26 +20,19 @@ use HecFranco\PasswordPolicyBundle\Service\PasswordHistoryServiceInterface;
 #[AsDoctrineListener(event: Events::onFlush, priority: 500, connection: 'default')]
 class PasswordEntityListener
 {
-  private array $processedNewEntities = [];
-
   private array $processedPasswords = [];
 
   /**
    * PasswordEntityListener constructor.
-   * @param PasswordHistoryServiceInterface $passwordHistoryService
-   * @param string $passwordField
-   * @param string $passwordHistoryField
-   * @param int $historyLimit
-   * @param string $entityClass
    */
   public function __construct(public PasswordHistoryServiceInterface $passwordHistoryService, private readonly string $passwordField, private readonly string $passwordHistoryField, private readonly int $historyLimit, private readonly string $entityClass)
   {
   }
 
   #[ORM\OnFlush]
-  public function onFlush(OnFlushEventArgs $eventArgs): void
+  public function onFlush(OnFlushEventArgs $onFlushEventArgs): void
   {
-    $em = $eventArgs->getObjectManager();
+    $em = $onFlushEventArgs->getObjectManager();
     $unitOfWork = $em->getUnitOfWork();
     //
     foreach ($unitOfWork->getIdentityMap() as $entities) {
@@ -72,24 +66,27 @@ class PasswordEntityListener
  * @return ?PasswordHistoryInterface an instance of the PasswordHistoryInterface or null.
  */
   public function createPasswordHistory(
-    EntityManagerInterface $em,
-    HasPasswordPolicyInterface $entity,
+    EntityManagerInterface $entityManager,
+    HasPasswordPolicyInterface $hasPasswordPolicy,
     ?string $oldPassword
   ): ?PasswordHistoryInterface {
     if (is_null($oldPassword) || $oldPassword === '') {
-      $oldPassword = $entity->getPassword();
+      $oldPassword = $hasPasswordPolicy->getPassword();
     }
+
     //
     if ($oldPassword === '' || $oldPassword === '0') {
       return null;
     }
+
     //
     if (array_key_exists($oldPassword, $this->processedPasswords)) {
       return null;
     }
+
     //
-    $unitOfWork = $em->getUnitOfWork();
-    $entityMeta = $em->getClassMetadata($entity::class);
+    $unitOfWork = $entityManager->getUnitOfWork();
+    $entityMeta = $entityManager->getClassMetadata($hasPasswordPolicy::class);
     //
     $historyClass = $entityMeta->associationMappings[$this->passwordHistoryField]['targetEntity'];
     $mappedField = $entityMeta->associationMappings[$this->passwordHistoryField]['mappedBy'];
@@ -103,6 +100,7 @@ class PasswordEntityListener
         PasswordHistoryInterface::class
       ));
     }
+
     //
     $userSetter = 'set' . ucfirst((string) $mappedField);
     // Check if the history class has a setter method for the user relation.
@@ -113,30 +111,31 @@ class PasswordEntityListener
         $userSetter
       ));
     }
+
     //
-    $history->$userSetter($entity);
+    $history->$userSetter($hasPasswordPolicy);
     $history->setPassword($oldPassword);
-    $history->setCreatedAt(new DateTime());
+    $history->setCreatedAt(Carbon::now());
     // $history->setSalt($entity->getSalt());
     //
-    $entity->addPasswordHistory($history);
+    $hasPasswordPolicy->addPasswordHistory($history);
 
     $this->processedPasswords[$oldPassword] = $history;
 
-    $stalePasswords = $this->passwordHistoryService->getHistoryItemsForCleanup($entity, $this->historyLimit);
+    $stalePasswords = $this->passwordHistoryService->getHistoryItemsForCleanup($hasPasswordPolicy, $this->historyLimit);
 
     foreach ($stalePasswords as $stalePassword) {
-      $em->remove($stalePassword);
+      $entityManager->remove($stalePassword);
     }
 
-    $em->persist($history);
+    $entityManager->persist($history);
 
-    $metadata = $em->getClassMetadata($historyClass);
+    $metadata = $entityManager->getClassMetadata($historyClass);
     $unitOfWork->computeChangeSet($metadata, $history);
 
-    $entity->setPasswordChangedAt(new DateTime());
+    $hasPasswordPolicy->setPasswordChangedAt(Carbon::now());
     // We need to recompute the change set so we won't trigger updates instead of inserts.
-    $unitOfWork->recomputeSingleEntityChangeSet($entityMeta, $entity);
+    $unitOfWork->recomputeSingleEntityChangeSet($entityMeta, $hasPasswordPolicy);
 
     return $history;
   }

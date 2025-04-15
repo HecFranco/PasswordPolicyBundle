@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace HecFranco\PasswordPolicyBundle\DependencyInjection;
 
@@ -23,34 +24,32 @@ class PasswordPolicyExtension extends Extension
   /**
    * Loads a specific configuration.
    *
-   * @param array $configs
-   * @param ContainerBuilder $container
    * @throws Exception
    */
-  public function load(array $configs, ContainerBuilder $container): void
+  public function load(array $configs, ContainerBuilder $containerBuilder): void
   {
-    $loader = new YamlFileLoader(
-      $container,
+    $yamlFileLoader = new YamlFileLoader(
+      $containerBuilder,
       new FileLocator(__DIR__ . '/../Resources/config')
     );
 
-    $loader->load('services.yml');
+    $yamlFileLoader->load('services.yml');
 
     $configuration = new Configuration();
     $config = $this->processConfiguration($configuration, $configs);
 
-    $this->addExpiryListener($container, $config);
+    $this->addExpiryListener($containerBuilder, $config);
 
-    $expiryService = $container->getDefinition(PasswordExpiryService::class);
+    $definition = $containerBuilder->getDefinition(PasswordExpiryService::class);
 
     foreach ($config['entities'] as $entityClass => $settings) {
       if (!class_exists($entityClass)) {
         throw new ConfigurationException(sprintf('Entity class %s not found', $entityClass));
       }
 
-      $this->addEntityListener($container, $entityClass, $settings);
+      $this->addEntityListener($containerBuilder, $entityClass, $settings);
 
-      $passwordExpiryConfig = $container->register(
+      $passwordExpiryConfig = $containerBuilder->register(
         'password_expiry_configuration.' . $entityClass,
         PasswordExpiryConfiguration::class
       );
@@ -61,18 +60,13 @@ class PasswordPolicyExtension extends Extension
         $settings['excluded_notified_routes'],
       ]);
 
-      $expiryService->addMethodCall('addEntity', [$passwordExpiryConfig]);
+      $definition->addMethodCall('addEntity', [$passwordExpiryConfig]);
     }
   }
 
-  /**
-   * @param ContainerBuilder $container
-   * @param array $config
-   * @return Definition
-   */
-  private function addExpiryListener(ContainerBuilder $container, array $config): Definition
+  private function addExpiryListener(ContainerBuilder $containerBuilder, array $config): Definition
   {
-    return $container->autowire(PasswordExpiryListener::class)
+    return $containerBuilder->autowire(PasswordExpiryListener::class)
       ->addTag('kernel.event_listener', [
         'event' => 'kernel.request',
         'priority' => $config['expiry_listener']['priority'],
@@ -82,39 +76,37 @@ class PasswordPolicyExtension extends Extension
   }
 
   /**
-   * @param ContainerBuilder $container
    * @param $entityClass
    * @param $settings
-   * @return Definition
    * @throws ConfigurationException
    */
   private function addEntityListener(
-    ContainerBuilder $container,
+    ContainerBuilder $containerBuilder,
     string $entityClass,
     array $settings
   ): Definition {
     if (!is_a($entityClass, HasPasswordPolicyInterface::class, true)) {
       throw new ConfigurationException(sprintf(
-        'Entity %s doesn\'t implement %s interface',
+        "Entity %s doesn't implement %s interface",
         $entityClass,
         HasPasswordPolicyInterface::class
       ));
     }
 
     $snakeClass = strtolower(str_replace('\\', '_', $entityClass));
-    $entityListener = $container->autowire(
+    $definition = $containerBuilder->autowire(
       'hec_franco_password_policy.entity_listener.' . $snakeClass,
       PasswordEntityListener::class
     );
 
-    $entityListener->addTag('doctrine.event_listener', ['event' => 'onFlush']);
+    $definition->addTag('doctrine.event_listener', ['event' => 'onFlush']);
 
-    $entityListener->setArgument('$passwordField', $settings['password_field']);
-    $entityListener->setArgument('$passwordHistoryField', $settings['password_history_field']);
-    $entityListener->setArgument('$historyLimit', $settings['passwords_to_remember']);
-    $entityListener->setArgument('$entityClass', $entityClass);
+    $definition->setArgument('$passwordField', $settings['password_field']);
+    $definition->setArgument('$passwordHistoryField', $settings['password_history_field']);
+    $definition->setArgument('$historyLimit', $settings['passwords_to_remember']);
+    $definition->setArgument('$entityClass', $entityClass);
 
-    return $entityListener;
+    return $definition;
   }
 
   public function getAlias(): string

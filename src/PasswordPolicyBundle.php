@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace HecFranco\PasswordPolicyBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -17,6 +19,7 @@ class PasswordPolicyBundle extends Bundle
     if (null === $this->extension) {
       $this->extension = new PasswordPolicyExtension();
     }
+
     return $this->extension;
   }
 }
